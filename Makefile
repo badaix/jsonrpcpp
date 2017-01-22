@@ -1,4 +1,4 @@
-CXXFLAGS += $(ADD_CFLAGS) -std=c++0x -Wall -Wno-unused-function -O3 -I. -I../..
+CXXFLAGS += $(ADD_CFLAGS) -std=c++0x -Wall -Wno-unused-function -O3 -I.
 CXX       = /usr/bin/g++
 STRIP     = strip
 BIN       = jsonrpctest

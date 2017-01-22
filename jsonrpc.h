@@ -23,7 +23,7 @@
 #include <cstring>
 #include <vector>
 #include <exception>
-#include "externals/json.hpp"
+#include "json.hpp"
 
 
 using Json = nlohmann::json;
