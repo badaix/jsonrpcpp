@@ -120,19 +120,17 @@ struct Id : Entity
 class Error : public Entity
 {
 public:
+	Error(const Json& json = nullptr);
+
+	Error(std::nullptr_t) : Entity(entity_t::error, nullptr), code(0), message(""), data(nullptr)
+	{
+	}
+
 	Error(int code, const std::string& message, const Json& data = nullptr) : Entity(entity_t::error), code(code), message(message), data(data)
 	{
 	}
 
 	Error(const std::string& message, const Json& data = nullptr) : Error(-32603, message, data)
-	{
-	}
-
-	Error() : Error(-32603, "Internal error", nullptr)
-	{
-	}
-
-	Error(std::nullptr_t) : Entity(entity_t::error, nullptr), code(0), message(""), data(nullptr)
 	{
 	}
 
@@ -274,41 +272,6 @@ public:
 
 
 
-
-class Response : public Entity
-{
-public:
-	Id id;
-	Json result;
-	Error error;
-
-	Response() : Entity(entity_t::response)
-	{
-	}
-
-	Response(std::nullptr_t) : Entity(entity_t::response, nullptr), id(), result(""), error()
-	{
-	}
-
-	Response(const Id& id, const Json& result) : Entity(entity_t::response), id(id), result(result), error(nullptr)
-	{
-	}
-
-	Response(const Id& id, const Error& error) : Entity(entity_t::response), id(id), result(), error(error)
-	{
-	}
-
-	virtual void parse(const Json& json);
-
-	virtual Json to_json() const;
-
-
-protected:
-	Json json_;
-	bool success_;
-};
-
-
 /// JSON-RPC 2.0 request
 /**
  * Simple jsonrpc 2.0 parser with getters
@@ -318,16 +281,13 @@ class Request : public Entity
 {
 public:
 	std::string method;
-	std::map<std::string, Json> params;
+	Json params;
 	Id id;
 
 	Request(const Json& json = nullptr);
 
 	virtual void parse(const Json& json);
 	virtual void parse(const std::string& json_str);
-
-	jsonrpc::Response getResponse(const Json& result) const;
-	jsonrpc::Response getError(const jsonrpc::Error& error) const;
 
 	Json getParam(const std::string& key);
 	bool hasParam(const std::string& key);
@@ -346,10 +306,26 @@ public:
 
 	virtual Json to_json() const;
 
+};
 
-protected:
-	Json json_;
 
+
+class Response : public Entity
+{
+public:
+	Id id;
+	Json result;
+	Error error;
+
+	Response(const Json& json = nullptr);
+	Response(const Id& id, const Json& result);
+	Response(const Id& id, const Error& error);
+	Response(const Request& request, const Json& result);
+	Response(const Request& request, const Error& error);
+
+	virtual void parse(const Json& json);
+
+	virtual Json to_json() const;
 };
 
 
@@ -358,27 +334,33 @@ class Notification : public Entity
 {
 public:
 	std::string method;
-
-	Notification();
+	Json params;
+	Notification(const Json& json = nullptr);
 
 	static Json getJson(const std::string& method, const Json& data);
 	virtual void parse(const Json& json);
+	virtual Json to_json() const;
 };
 
 
 typedef std::shared_ptr<Entity> entity_ptr;
-typedef std::shared_ptr<Request> request_ptr;
-typedef std::shared_ptr<Notification> notification_ptr;
-
 
 class Batch : public Entity
 {
 public:
 	std::vector<entity_ptr> requests;
 
-	Batch();
+	Batch(const Json& json = nullptr);
 
+	virtual void parse(const Json& json);
+	virtual Json to_json() const;
 };
+
+
+typedef std::shared_ptr<Request> request_ptr;
+typedef std::shared_ptr<Notification> notification_ptr;
+typedef std::shared_ptr<Batch> batch_ptr;
+typedef std::shared_ptr<Response> response_ptr;
 
 
 

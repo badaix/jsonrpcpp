@@ -8,27 +8,69 @@
 
 #include "jsonrpc.h"
 
+using namespace std;
 
 void test(const std::string& json_str)
 {
 	try
 	{
-		std::cout << "Test: " << json_str << "\n";
-		jsonrpc::Parser::parse(json_str);
+		cout << "Test: " << json_str << "\n";
+		jsonrpc::entity_ptr entity = jsonrpc::Parser::parse(json_str);
+		if (entity)
+		{
+			cout << "Request: " << entity->is_request() << ", Notification: " << entity->is_notification() << ", Respone: " << entity->is_response() << ", Batch: " << entity->is_batch() << ", Error: " << entity->is_error() << "\n";
+			cout << "Json: " << entity->to_json().dump() << "\n";
+			if (entity->is_request())
+			{
+				jsonrpc::request_ptr request = dynamic_pointer_cast<jsonrpc::Request>(entity);
+				if (request->method == "subtract")
+				{
+					if (!request->params.is_null())
+					{
+						int result;
+						if (request->params.is_array())
+						{
+							cout << "params array\n";
+							result = request->params.get<std::vector<int>>()[0] - request->params.get<std::vector<int>>()[1];
+						}
+						else
+						{
+							cout << "params object\n";
+							result = request->params["minuend"].get<int>() - request->params["subtrahend"].get<int>();
+						}
+						jsonrpc::Response response;
+						response = jsonrpc::Response(*request, result);
+						cout << "Response: " << response.to_json().dump() << "\n";
+					}
+				}
+				else if (request->method == "sum")
+				{
+
+				}
+			}
+			else if (entity->is_notification())
+			{
+				jsonrpc::notification_ptr request = dynamic_pointer_cast<jsonrpc::Notification>(entity);
+			}
+			else if (entity->is_batch())
+			{
+				jsonrpc::batch_ptr request = dynamic_pointer_cast<jsonrpc::Batch>(entity);
+			}
+		}
 	}
 	catch(const jsonrpc::RequestException& e)
 	{
-		std::cerr << "RequestException: " << e.what() << "\n";
+		cerr << "RequestException: " << e.what() << "\n";
 	}
 	catch(const jsonrpc::RpcException& e)
 	{
-		std::cerr << "RpcException: " << e.what() << "\n";
+		cerr << "RpcException: " << e.what() << "\n";
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "Exception: " << e.what() << "\n";
+		cerr << "Exception: " << e.what() << "\n";
 	}
-	std::cout << "\n";
+	cout << "\n\n\n";
 }
 
 
