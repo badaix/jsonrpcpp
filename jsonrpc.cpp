@@ -129,6 +129,93 @@ Json Id::to_json() const
 
 //////////////////////// Error implementation /////////////////////////////////
 
+Parameter::Parameter(std::nullptr_t) : Entity(entity_t::id, nullptr), type(value_t::null)
+{
+}
+
+
+Parameter::Parameter(const Json& json) : Entity(entity_t::id), type(value_t::null)
+{	
+}
+
+
+void Parameter::parse(const Json& json)
+{
+	if (json.is_array())
+	{
+		param_array = json.get<std::vector<Json>>();
+		type = value_t::array;
+	}
+	else
+	{
+		param_map = json.get<std::map<std::string, Json>>();
+		type = value_t::map;
+	}
+}
+
+
+Json Parameter::to_json() const
+{
+	if (type == value_t::array)
+		return param_array;
+	else if (type == value_t::map)
+		return param_map;
+	else
+		return nullptr;
+}
+
+
+bool Parameter::is_array() const
+{
+	return type == value_t::array;
+}
+
+
+bool Parameter::is_map() const
+{
+	return type == value_t::map;
+}
+
+
+bool Parameter::is_null() const
+{
+	return isNull;
+}
+
+
+bool Parameter::has(const std::string& key) const
+{
+	if (type != value_t::map)
+		return false;
+	return (param_map.find(key) != param_map.end());
+}
+
+
+Json Parameter::get(const std::string& key) const
+{
+	return param_map.at(key);
+}
+
+
+bool Parameter::has(size_t idx) const
+{
+	if (type != value_t::array)
+		return false;
+	return (param_array.size() > idx);
+}
+
+
+Json Parameter::get(size_t idx) const
+{
+	return param_array.at(idx);
+}
+
+
+
+
+
+//////////////////////// Error implementation /////////////////////////////////
+
 Error::Error(const Json& json) : Error(-32603, "Internal error", nullptr)
 {
 	if (json != nullptr)
@@ -214,7 +301,7 @@ void Request::parse(const Json& json)
 			throw InvalidRequestException("method must not be empty", id);
 
 		if (json.count("params"))
-			params = json["params"];
+			params.parse(json["params"]);
 		else
 			params = nullptr;
 	}
@@ -263,19 +350,6 @@ jsonrpc::Response Request::getError(const jsonrpc::Error& error) const
 }
 */
 
-bool Request::hasParam(const std::string& key)
-{
-	return (params.find(key) != params.end());
-}
-
-
-Json Request::getParam(const std::string& key)
-{
-	if (!hasParam(key))
-		throw InvalidParamsException(id);
-	return params[key];
-}
-
 
 Json Request::to_json() const
 {
@@ -285,8 +359,8 @@ Json Request::to_json() const
 		{"id", id.to_json()}
 	};
 
-	if (!params.is_null())
-		json["params"] = params;
+	if (params)
+		json["params"] = params.to_json();
 	
 	return json;
 }
@@ -393,18 +467,18 @@ Notification::Notification(const Json& json) : Entity(entity_t::notification)
 		parse(json);
 }
 
-
+/*
 Json Notification::getJson(const std::string& method, const Json& data)
 {
 	Json notification = {
 		{"jsonrpc", "2.0"},
 		{"method", method},
-		{"params", data}
+		{"params", params.to_json()}
 	};
 
 	return notification;
 }
-
+*/
 
 void Notification::parse(const Json& json)
 {
@@ -423,7 +497,7 @@ void Notification::parse(const Json& json)
 			throw RpcException("method must not be empty");
 
 		if (json.count("params"))
-			params = json["params"];
+			params.parse(json["params"]);
 		else
 			params = nullptr;
 	}
@@ -445,8 +519,8 @@ Json Notification::to_json() const
 		{"method", method},
 	};
 
-	if (!params.is_null())
-		json["params"] = params;
+	if (params)//.is_null())
+		json["params"] = params.to_json();
 
 	return json;
 }

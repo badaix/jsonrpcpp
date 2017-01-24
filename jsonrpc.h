@@ -117,6 +117,70 @@ struct Id : Entity
 
 
 
+struct Parameter : Entity
+{
+	enum class value_t : uint8_t
+	{
+		null,
+		array,
+		map
+	};
+
+	Parameter(std::nullptr_t);
+	Parameter(const Json& json = nullptr);
+
+	virtual void parse(const Json& json);
+
+	virtual Json to_json() const;
+
+	bool is_array() const;
+	bool is_map() const;
+	bool is_null() const;
+
+	Json get(const std::string& key) const;
+	bool has(const std::string& key) const;
+
+	template<typename T>
+	T get(const std::string& key) const
+	{
+		return get(key).get<T>();
+	}
+
+	template<typename T>
+	T get(const std::string& key, const T& default_value) const
+	{
+		if (!has(key))
+			return default_value;
+		else
+			return get<T>(key);
+	}
+
+
+	Json get(size_t idx) const;
+	bool has(size_t idx) const;
+
+	template<typename T>
+	T get(size_t idx) const
+	{
+		return get(idx).get<T>();
+	}
+
+	template<typename T>
+	T get(size_t idx, const T& default_value) const
+	{
+		if (!has(idx))
+			return default_value;
+		else
+			return get<T>(idx);
+	}
+
+	value_t type;
+	std::vector<Json> param_array;
+	std::map<std::string, Json> param_map;
+};
+
+
+
 class Error : public Entity
 {
 public:
@@ -281,7 +345,7 @@ class Request : public Entity
 {
 public:
 	std::string method;
-	Json params;
+	Parameter params;
 	Id id;
 
 	Request(const Json& json = nullptr);
@@ -289,7 +353,7 @@ public:
 	virtual void parse(const Json& json);
 	virtual void parse(const std::string& json_str);
 
-	Json getParam(const std::string& key);
+/*	Json getParam(const std::string& key);
 	bool hasParam(const std::string& key);
 
 	template<typename T>
@@ -303,7 +367,7 @@ public:
 
 		return value;
 	}
-
+*/
 	virtual Json to_json() const;
 
 };
@@ -334,10 +398,10 @@ class Notification : public Entity
 {
 public:
 	std::string method;
-	Json params;
+	Parameter params;
 	Notification(const Json& json = nullptr);
 
-	static Json getJson(const std::string& method, const Json& data);
+	//static Json getJson(const std::string& method, const Json& data);
 	virtual void parse(const Json& json);
 	virtual Json to_json() const;
 };
