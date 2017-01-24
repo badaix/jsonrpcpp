@@ -216,7 +216,7 @@ Json Parameter::get(size_t idx) const
 
 //////////////////////// Error implementation /////////////////////////////////
 
-Error::Error(const Json& json) : Error(-32603, "Internal error", nullptr)
+Error::Error(const Json& json) : Error("Internal error", -32603, nullptr)
 {
 	if (json != nullptr)
 		parse(json);
@@ -254,7 +254,7 @@ Json Error::to_json() const
 			{"message", message},
 		};
 
-	if (data)
+	if (!data.is_null())
 		j["data"] = data;
 	return j;
 }
@@ -337,20 +337,6 @@ void Request::parse(const std::string& json_str)
 }
 
 
-/*
-jsonrpc::Response Request::getResponse(const Json& result) const
-{
-	return Response(id, result);
-}
-
-
-jsonrpc::Response Request::getError(const jsonrpc::Error& error) const
-{
-	return Response(id, error);
-}
-*/
-
-
 Json Request::to_json() const
 {
 	Json json = {
@@ -364,16 +350,6 @@ Json Request::to_json() const
 	
 	return json;
 }
-
-
-/*
-bool JsonRequest::isParam(size_t idx, const std::string& param)
-{
-	if (idx >= params.size())
-		throw InvalidParamsException(*this);
-	return (params[idx] == param);
-}
-*/
 
 
 
@@ -467,18 +443,6 @@ Notification::Notification(const Json& json) : Entity(entity_t::notification)
 		parse(json);
 }
 
-/*
-Json Notification::getJson(const std::string& method, const Json& data)
-{
-	Json notification = {
-		{"jsonrpc", "2.0"},
-		{"method", method},
-		{"params", params.to_json()}
-	};
-
-	return notification;
-}
-*/
 
 void Notification::parse(const Json& json)
 {

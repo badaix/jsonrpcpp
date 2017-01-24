@@ -48,7 +48,7 @@ void test(const std::string& json_str)
 				}
 				else 
 				{
-					cout << "TODO: handle method not found\n";
+					throw jsonrpc::MethodNotFoundException(*request);
 				}
 			}
 			else if (entity->is_notification())
@@ -65,6 +65,7 @@ void test(const std::string& json_str)
 	}
 	catch(const jsonrpc::RequestException& e)
 	{
+		cout << " Response: " << e.getResponse().dump() << "\n";
 		cerr << "RequestException: " << e.what() << "\n";
 	}
 	catch(const jsonrpc::RpcException& e)

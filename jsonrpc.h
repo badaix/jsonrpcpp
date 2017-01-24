@@ -190,11 +190,7 @@ public:
 	{
 	}
 
-	Error(int code, const std::string& message, const Json& data = nullptr) : Entity(entity_t::error), code(code), message(message), data(data)
-	{
-	}
-
-	Error(const std::string& message, const Json& data = nullptr) : Error(-32603, message, data)
+	Error(const std::string& message, int code, const Json& data = nullptr) : Entity(entity_t::error), code(code), message(message), data(data)
 	{
 	}
 
@@ -205,6 +201,28 @@ public:
 	int code;
 	std::string message;
 	Json data;
+};
+
+
+
+/// JSON-RPC 2.0 request
+/**
+ * Simple jsonrpc 2.0 parser with getters
+ * Currently no named parameters are supported, but only array parameters
+ */
+class Request : public Entity
+{
+public:
+	std::string method;
+	Parameter params;
+	Id id;
+
+	Request(const Json& json = nullptr);
+
+	virtual void parse(const Json& json);
+	virtual void parse(const std::string& json_str);
+
+	virtual Json to_json() const;
 };
 
 
@@ -287,6 +305,10 @@ public:
 	{
 	}
 
+	InvalidRequestException(const Request& request) : InvalidRequestException(request.id)
+	{
+	}
+
 	InvalidRequestException(const std::string& message, const Id& requestId = Id()) : RequestException(message, -32600, requestId)
 	{
 	}
@@ -298,6 +320,10 @@ class MethodNotFoundException : public RequestException
 {
 public:
 	MethodNotFoundException(const Id& requestId = Id()) : RequestException("method not found", -32601, requestId)
+	{
+	}
+
+	MethodNotFoundException(const Request& request) : MethodNotFoundException(request.id)
 	{
 	}
 
@@ -315,10 +341,15 @@ public:
 	{
 	}
 
+	InvalidParamsException(const Request& request) : InvalidParamsException(request.id)
+	{
+	}
+
 	InvalidParamsException(const std::string& message, const Id& requestId = Id()) : RequestException(message, -32602, requestId)
 	{
 	}
 };
+
 
 
 class InternalErrorException : public RequestException
@@ -328,49 +359,15 @@ public:
 	{
 	}
 
+	InternalErrorException(const Request& request) : InternalErrorException(request.id)
+	{
+	}
+
 	InternalErrorException(const std::string& message, const Id& requestId = Id()) : RequestException(message, -32603, requestId)
 	{
 	}
 };
 
-
-
-
-/// JSON-RPC 2.0 request
-/**
- * Simple jsonrpc 2.0 parser with getters
- * Currently no named parameters are supported, but only array parameters
- */
-class Request : public Entity
-{
-public:
-	std::string method;
-	Parameter params;
-	Id id;
-
-	Request(const Json& json = nullptr);
-
-	virtual void parse(const Json& json);
-	virtual void parse(const std::string& json_str);
-
-/*	Json getParam(const std::string& key);
-	bool hasParam(const std::string& key);
-
-	template<typename T>
-	T getParam(const std::string& key, const T& lowerRange, const T& upperRange)
-	{
-		T value = getParam(key).get<T>();
-		if (value < lowerRange)
-			throw InvalidParamsException(key + " out of range", id);
-		else if (value > upperRange)
-			throw InvalidParamsException(key + " out of range", id);
-
-		return value;
-	}
-*/
-	virtual Json to_json() const;
-
-};
 
 
 
