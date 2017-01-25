@@ -46,6 +46,8 @@ public:
 		batch
 	};
 
+	std::string type_str() const;
+
 	Entity(entity_t type);
 	Entity(entity_t type, std::nullptr_t);
 	virtual ~Entity();
@@ -263,11 +265,7 @@ class RequestException : public RpcException
   Error error_;
   Id id_;
 public:
-	RequestException(const char* text, int errorCode = 0, const Id& requestId = Id()) : RpcException(text), error_(text, errorCode), id_(requestId)
-	{
-	}
-
-	RequestException(const std::string& text, int errorCode = 0, const Id& requestId = Id()) : RpcException(text), error_(text, errorCode), id_(requestId)
+	RequestException(const Error& error, const Id& requestId = Id()) : RpcException(error.message), error_(error), id_(requestId)
 	{
 	}
 
@@ -301,7 +299,7 @@ public:
 class InvalidRequestException : public RequestException
 {
 public:
-	InvalidRequestException(const Id& requestId = Id()) : RequestException("invalid request", -32600, requestId)
+	InvalidRequestException(const Id& requestId = Id()) : RequestException(Error("invalid request", -32600), requestId)
 	{
 	}
 
@@ -309,7 +307,7 @@ public:
 	{
 	}
 
-	InvalidRequestException(const std::string& message, const Id& requestId = Id()) : RequestException(message, -32600, requestId)
+	InvalidRequestException(const std::string& message, const Id& requestId = Id()) : RequestException(Error(message, -32600), requestId)
 	{
 	}
 };
@@ -319,7 +317,7 @@ public:
 class MethodNotFoundException : public RequestException
 {
 public:
-	MethodNotFoundException(const Id& requestId = Id()) : RequestException("method not found", -32601, requestId)
+	MethodNotFoundException(const Id& requestId = Id()) : RequestException(Error("method not found", -32601), requestId)
 	{
 	}
 
@@ -327,7 +325,7 @@ public:
 	{
 	}
 
-	MethodNotFoundException(const std::string& message, const Id& requestId = Id()) : RequestException(message, -32601, requestId)
+	MethodNotFoundException(const std::string& message, const Id& requestId = Id()) : RequestException(Error(message, -32601), requestId)
 	{
 	}
 };
@@ -337,7 +335,7 @@ public:
 class InvalidParamsException : public RequestException
 {
 public:
-	InvalidParamsException(const Id& requestId = Id()) : RequestException("invalid params", -32602, requestId)
+	InvalidParamsException(const Id& requestId = Id()) : RequestException(Error("invalid params", -32602), requestId)
 	{
 	}
 
@@ -345,7 +343,7 @@ public:
 	{
 	}
 
-	InvalidParamsException(const std::string& message, const Id& requestId = Id()) : RequestException(message, -32602, requestId)
+	InvalidParamsException(const std::string& message, const Id& requestId = Id()) : RequestException(Error(message, -32602), requestId)
 	{
 	}
 };
@@ -355,7 +353,7 @@ public:
 class InternalErrorException : public RequestException
 {
 public:
-	InternalErrorException(const Id& requestId = Id()) : RequestException("internal error", -32603, requestId)
+	InternalErrorException(const Id& requestId = Id()) : RequestException(Error("internal error", -32603), requestId)
 	{
 	}
 
@@ -363,7 +361,7 @@ public:
 	{
 	}
 
-	InternalErrorException(const std::string& message, const Id& requestId = Id()) : RequestException(message, -32603, requestId)
+	InternalErrorException(const std::string& message, const Id& requestId = Id()) : RequestException(Error(message, -32603), requestId)
 	{
 	}
 };
@@ -406,10 +404,19 @@ public:
 
 typedef std::shared_ptr<Entity> entity_ptr;
 
+
+class Parser
+{
+public:
+	static entity_ptr parse(const std::string& json_str);
+	static entity_ptr parse(const Json& json);
+};
+
+
 class Batch : public Entity
 {
 public:
-	std::vector<entity_ptr> requests;
+	std::vector<entity_ptr> entities;
 
 	Batch(const Json& json = nullptr);
 
@@ -418,18 +425,12 @@ public:
 };
 
 
+typedef std::shared_ptr<Error> error_ptr;
 typedef std::shared_ptr<Request> request_ptr;
 typedef std::shared_ptr<Notification> notification_ptr;
 typedef std::shared_ptr<Batch> batch_ptr;
 typedef std::shared_ptr<Response> response_ptr;
 
-
-
-class Parser
-{
-public:
-	static entity_ptr parse(const std::string& json_str);
-};
 
 
 

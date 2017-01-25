@@ -84,7 +84,28 @@ void Entity::parse(const std::string& json_str)
 }
 
 
-
+std::string Entity::type_str() const
+{
+	switch (entity)
+	{
+		case entity_t::unknown: 
+			return "unknown";
+		case entity_t::id:
+			return "id";
+		case entity_t::error:
+			return "error";
+		case entity_t::response:
+			return "response";
+		case entity_t::request:
+			return "request";
+		case entity_t::notification:
+			return "notification";
+		case entity_t::batch:
+			return "batch";
+		default:
+			return "unknown";
+	}
+}
 
 
 /////////////////////////// Id implementation /////////////////////////////////
@@ -332,7 +353,7 @@ void Request::parse(const std::string& json_str)
 	}
 	catch (const exception& e)
 	{
-		throw RequestException(e.what(), -32700);
+		throw RequestException(Error(e.what(), -32700));
 	}
 }
 
@@ -416,8 +437,6 @@ void Response::parse(const Json& json)
 
 Json Response::to_json() const
 {
-	//bool isError(error);
-	//std::clog << "Response::to_json error: " << isError << "\n";
 	Json j = {
 		{"jsonrpc", "2.0"},
 		{"id", id.to_json()},
@@ -483,7 +502,7 @@ Json Notification::to_json() const
 		{"method", method},
 	};
 
-	if (params)//.is_null())
+	if (params)
 		json["params"] = params.to_json();
 
 	return json;
@@ -502,12 +521,24 @@ Batch::Batch(const Json& json) : Entity(entity_t::batch)
 
 void Batch::parse(const Json& json)
 {
+//	cout << "Batch::parse: " << json.dump() << "\n";
+	for (auto it = json.begin(); it != json.end(); ++it) 
+	{
+//		cout << "x: " << it->dump() << "\n";
+		entity_ptr entity = Parser::parse(*it);
+		if (!entity)
+			entity = make_shared<Error>("Invalid Request", -32600);
+		entities.push_back(entity);
+	}
 }
 
 
 Json Batch::to_json() const
 {
-	return nullptr;
+	Json result;
+	for (const auto& j: entities)
+		result.push_back(j->to_json());
+	return result;
 }
 
 
@@ -520,7 +551,22 @@ entity_ptr Parser::parse(const std::string& json_str)
 {
 	try
 	{
-		Json json = Json::parse(json_str);
+		return parse(Json::parse(json_str));
+	}
+	catch (const exception& e)
+	{
+		throw RpcException(e.what());
+	}
+
+	return nullptr;
+}
+
+
+entity_ptr Parser::parse(const Json& json)
+{
+	try
+	{
+//		cout << "Parser::parse: " << json.dump() << "\n";
 		if (json.count("method") && json.count("id"))
 		{
 			//Request: contains "method" and "id"

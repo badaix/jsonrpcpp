@@ -60,6 +60,10 @@ void test(const std::string& json_str)
 			{
 				jsonrpc::batch_ptr batch = dynamic_pointer_cast<jsonrpc::Batch>(entity);
 				cout << " Batch\n";
+				for (const auto& j: batch->entities)
+				{
+					cout << j->type_str() << ": \t" << j->to_json() << "\n";
+				}
 			}
 		}
 	}
