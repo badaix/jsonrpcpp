@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "jsonrpc.h"
+#include "jsonrp.hpp"
 
 
 using namespace std;

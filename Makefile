@@ -4,7 +4,7 @@ CXX       = g++
 STRIP     = strip
 CXXFLAGS  = -std=c++0x -Wall -O3 -I.
 
-OBJ       = jsonrpctest.o jsonrpc.o
+OBJ       = jsonrpctest.o jsonrp.o
 
 
 all: $(OBJ)
