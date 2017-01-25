@@ -1,7 +1,7 @@
 /*
     __ _____ _____ _____
  __|  |   __|     |   | |  JSON for Modern C++
-|  |  |__   |  |  | | | |  version 2.0.0
+|  |  |__   |  |  | | | |  version 2.0.1
 |_____|_____|_____|_|___|  https://github.com/nlohmann/json
 
 Licensed under the MIT License <http://opensource.org/licenses/MIT>.
@@ -52,8 +52,6 @@ SOFTWARE.
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-#include "strCompat.h"
 
 // disable float-equal warnings on GCC/clang
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
@@ -2099,6 +2097,8 @@ class basic_json
     string_t dump(const int indent = -1) const
     {
         std::stringstream ss;
+        // fix locale problems
+        ss.imbue(std::locale(std::locale(), new DecimalSeparator));
 
         if (indent >= 0)
         {
@@ -3049,7 +3049,7 @@ class basic_json
             catch (std::out_of_range&)
             {
                 // create better exception explanation
-                throw std::out_of_range("array index " + cpt::to_string(idx) + " is out of range");
+                throw std::out_of_range("array index " + std::to_string(idx) + " is out of range");
             }
         }
         else
@@ -3093,7 +3093,7 @@ class basic_json
             catch (std::out_of_range&)
             {
                 // create better exception explanation
-                throw std::out_of_range("array index " + cpt::to_string(idx) + " is out of range");
+                throw std::out_of_range("array index " + std::to_string(idx) + " is out of range");
             }
         }
         else
@@ -3990,7 +3990,7 @@ class basic_json
         {
             if (idx >= size())
             {
-                throw std::out_of_range("array index " + cpt::to_string(idx) + " is out of range");
+                throw std::out_of_range("array index " + std::to_string(idx) + " is out of range");
             }
 
             assert(m_value.array != nullptr);
@@ -5657,9 +5657,14 @@ class basic_json
 
         // reset width to 0 for subsequent calls to this stream
         o.width(0);
+        // fix locale problems
+        auto old_locale = o.imbue(std::locale(std::locale(), new DecimalSeparator));
 
         // do the actual serialization
         j.dump(o, pretty_print, static_cast<unsigned int>(indentation));
+
+        // reset locale
+        o.imbue(old_locale);
         return o;
     }
 
@@ -6130,11 +6135,8 @@ class basic_json
                     // string->double->string or string->long
                     // double->string; to be safe, we read this value from
                     // std::numeric_limits<number_float_t>::digits10
-                    std::stringstream ss;
-                    ss.imbue(std::locale(std::locale(), new DecimalSeparator));  // fix locale problems
-                    ss << std::setprecision(std::numeric_limits<double>::digits10)
-                       << m_value.number_float;
-                    o << ss.str();
+                    o << std::setprecision(std::numeric_limits<double>::digits10)
+                      << m_value.number_float;
                 }
                 return;
             }
@@ -6298,7 +6300,7 @@ class basic_json
                     // use integer array index as key
                     case value_t::array:
                     {
-                        return cpt::to_string(array_index);
+                        return std::to_string(array_index);
                     }
 
                     // use key from the object
@@ -8272,14 +8274,14 @@ basic_json_parser_63:
 
         @return the floating point number
 
-        @bug This function uses `cpt::strtof`, `std::strtod`, or `cpt::strtold`
+        @bug This function uses `std::strtof`, `std::strtod`, or `std::strtold`
         which use the current C locale to determine which character is used as
         decimal point character. This may yield to parse errors if the locale
         does not used `.`.
         */
         long double str_to_float_t(long double* /* type */, char** endptr) const
         {
-            return cpt::strtold(reinterpret_cast<typename string_t::const_pointer>(m_start), endptr);
+            return std::strtold(reinterpret_cast<typename string_t::const_pointer>(m_start), endptr);
         }
 
         /*!
@@ -8319,7 +8321,7 @@ basic_json_parser_63:
         */
         float str_to_float_t(float* /* type */, char** endptr) const
         {
-            return cpt::strtof(reinterpret_cast<typename string_t::const_pointer>(m_start), endptr);
+            return std::strtof(reinterpret_cast<typename string_t::const_pointer>(m_start), endptr);
         }
 
         /*!
@@ -8337,7 +8339,7 @@ basic_json_parser_63:
         parameter accordingly.
 
         If the number is a floating point number the number is then parsed
-        using @a std:strtod (or @a std:strtof or @a cpt::strtold).
+        using @a std:strtod (or @a std:strtof or @a std::strtold).
 
         @param[out] result  @ref basic_json object to receive the number, or
         NAN if the conversion read past the current token. The latter case
@@ -8862,7 +8864,7 @@ basic_json_parser_63:
                     case value_t::array:
                     {
                         // create an entry in the array
-                        result = &result->operator[](static_cast<size_type>(cpt::stoi(reference_token)));
+                        result = &result->operator[](static_cast<size_type>(std::stoi(reference_token)));
                         break;
                     }
 
@@ -8925,7 +8927,7 @@ basic_json_parser_63:
                         else
                         {
                             // convert array index to number; unchecked access
-                            ptr = &ptr->operator[](static_cast<size_type>(cpt::stoi(reference_token)));
+                            ptr = &ptr->operator[](static_cast<size_type>(std::stoi(reference_token)));
                         }
                         break;
                     }
@@ -8959,7 +8961,7 @@ basic_json_parser_63:
                         {
                             // "-" always fails the range check
                             throw std::out_of_range("array index '-' (" +
-                                                    cpt::to_string(ptr->m_value.array->size()) +
+                                                    std::to_string(ptr->m_value.array->size()) +
                                                     ") is out of range");
                         }
 
@@ -8970,7 +8972,7 @@ basic_json_parser_63:
                         }
 
                         // note: at performs range check
-                        ptr = &ptr->at(static_cast<size_type>(cpt::stoi(reference_token)));
+                        ptr = &ptr->at(static_cast<size_type>(std::stoi(reference_token)));
                         break;
                     }
 
@@ -9011,7 +9013,7 @@ basic_json_parser_63:
                         {
                             // "-" cannot be used for const access
                             throw std::out_of_range("array index '-' (" +
-                                                    cpt::to_string(ptr->m_value.array->size()) +
+                                                    std::to_string(ptr->m_value.array->size()) +
                                                     ") is out of range");
                         }
 
@@ -9022,7 +9024,7 @@ basic_json_parser_63:
                         }
 
                         // use unchecked array access
-                        ptr = &ptr->operator[](static_cast<size_type>(cpt::stoi(reference_token)));
+                        ptr = &ptr->operator[](static_cast<size_type>(std::stoi(reference_token)));
                         break;
                     }
 
@@ -9055,7 +9057,7 @@ basic_json_parser_63:
                         {
                             // "-" always fails the range check
                             throw std::out_of_range("array index '-' (" +
-                                                    cpt::to_string(ptr->m_value.array->size()) +
+                                                    std::to_string(ptr->m_value.array->size()) +
                                                     ") is out of range");
                         }
 
@@ -9066,7 +9068,7 @@ basic_json_parser_63:
                         }
 
                         // note: at performs range check
-                        ptr = &ptr->at(static_cast<size_type>(cpt::stoi(reference_token)));
+                        ptr = &ptr->at(static_cast<size_type>(std::stoi(reference_token)));
                         break;
                     }
 
@@ -9213,7 +9215,7 @@ basic_json_parser_63:
                         // iterate array and use index as reference string
                         for (size_t i = 0; i < value.m_value.array->size(); ++i)
                         {
-                            flatten(reference_string + "/" + cpt::to_string(i),
+                            flatten(reference_string + "/" + std::to_string(i),
                                     value.m_value.array->operator[](i), result);
                         }
                     }
@@ -9592,11 +9594,11 @@ basic_json_parser_63:
                         }
                         else
                         {
-                            const auto idx = cpt::stoi(last_path);
+                            const auto idx = std::stoi(last_path);
                             if (static_cast<size_type>(idx) > parent.size())
                             {
                                 // avoid undefined behavior
-                                throw std::out_of_range("array index " + cpt::to_string(idx) + " is out of range");
+                                throw std::out_of_range("array index " + std::to_string(idx) + " is out of range");
                             }
                             else
                             {
@@ -9640,7 +9642,7 @@ basic_json_parser_63:
             else if (parent.is_array())
             {
                 // note erase performs range check
-                parent.erase(static_cast<size_type>(cpt::stoi(last_path)));
+                parent.erase(static_cast<size_type>(std::stoi(last_path)));
             }
         };
 
@@ -9841,7 +9843,7 @@ basic_json_parser_63:
                     while (i < source.size() and i < target.size())
                     {
                         // recursive call to compare array values at index i
-                        auto temp_diff = diff(source[i], target[i], path + "/" + cpt::to_string(i));
+                        auto temp_diff = diff(source[i], target[i], path + "/" + std::to_string(i));
                         result.insert(result.end(), temp_diff.begin(), temp_diff.end());
                         ++i;
                     }
@@ -9858,7 +9860,7 @@ basic_json_parser_63:
                         result.insert(result.begin() + end_index, object(
                         {
                             {"op", "remove"},
-                            {"path", path + "/" + cpt::to_string(i)}
+                            {"path", path + "/" + std::to_string(i)}
                         }));
                         ++i;
                     }
@@ -9869,7 +9871,7 @@ basic_json_parser_63:
                         result.push_back(
                         {
                             {"op", "add"},
-                            {"path", path + "/" + cpt::to_string(i)},
+                            {"path", path + "/" + std::to_string(i)},
                             {"value", target[i]}
                         });
                         ++i;

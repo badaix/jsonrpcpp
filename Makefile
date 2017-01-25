@@ -1,7 +1,8 @@
-CXXFLAGS += $(ADD_CFLAGS) -std=c++0x -Wall -Wno-unused-function -O3 -I.
-CXX       = /usr/bin/g++
-STRIP     = strip
 BIN       = jsonrpctest
+
+CXX       = g++
+STRIP     = strip
+CXXFLAGS  = -std=c++0x -Wall -O3 -I.
 
 OBJ       = jsonrpctest.o jsonrpc.o
 
