@@ -108,7 +108,31 @@ std::string Entity::type_str() const
 }
 
 
+
+
+
 /////////////////////////// Id implementation /////////////////////////////////
+
+Id::Id() : Entity(entity_t::id, nullptr), type(value_t::null), int_id(0), string_id("")
+{
+}
+
+
+Id::Id(int id) : Entity(entity_t::id), type(value_t::integer), int_id(id), string_id("")
+{
+}
+
+
+Id::Id(const std::string& id) : Entity(entity_t::id), type(value_t::string), int_id(0), string_id(id)
+{
+}
+
+
+Id::Id(const Json& json_id) : Entity(entity_t::id), type(value_t::null)
+{
+	parse(json_id);
+}
+
 
 void Id::parse(const Json& json)
 {
@@ -241,6 +265,16 @@ Error::Error(const Json& json) : Error("Internal error", -32603, nullptr)
 {
 	if (json != nullptr)
 		parse(json);
+}
+
+
+Error::Error(std::nullptr_t) : Entity(entity_t::error, nullptr), code(0), message(""), data(nullptr)
+{
+}
+
+
+Error::Error(const std::string& message, int code, const Json& data) : Entity(entity_t::error), code(code), message(message), data(data)
+{
 }
 
 
