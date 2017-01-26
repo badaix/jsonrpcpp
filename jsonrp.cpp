@@ -189,11 +189,13 @@ void Parameter::parse(const Json& json)
 	if (json.is_array())
 	{
 		param_array = json.get<std::vector<Json>>();
+		param_map.clear();
 		type = value_t::array;
 	}
 	else
 	{
 		param_map = json.get<std::map<std::string, Json>>();
+		param_array.clear();
 		type = value_t::map;
 	}
 }
@@ -290,6 +292,8 @@ void Error::parse(const Json& json)
 		message = json["message"];
 		if (json.count("data"))
 			data = json["data"];
+		else
+			data = nullptr;
 	}
 	catch (const RpcException& e)
 	{
@@ -443,6 +447,8 @@ void Response::parse(const Json& json)
 {
 	try
 	{
+		error = nullptr;
+		result = nullptr;
 		if (json.count("jsonrpc") == 0)
 			throw RpcException("jsonrpc is missing");
 		string jsonrpc = json["jsonrpc"].get<string>();
@@ -556,6 +562,7 @@ Batch::Batch(const Json& json) : Entity(entity_t::batch)
 void Batch::parse(const Json& json)
 {
 //	cout << "Batch::parse: " << json.dump() << "\n";
+	entities.clear();
 	for (auto it = json.begin(); it != json.end(); ++it) 
 	{
 //		cout << "x: " << it->dump() << "\n";
@@ -564,6 +571,8 @@ void Batch::parse(const Json& json)
 			entity = make_shared<Error>("Invalid Request", -32600);
 		entities.push_back(entity);
 	}
+	if (entities.empty())
+		throw InvalidRequestException();
 }
 
 
