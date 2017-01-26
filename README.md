@@ -8,7 +8,7 @@ It parses and contructs JSON RPC 2.0 objects, like
 * [Request](http://www.jsonrpc.org/specification#request_object)
   * [Notification](http://www.jsonrpc.org/specification#notification)
   * [Parameter](http://www.jsonrpc.org/specification#parameter_structures)
-* [Response](http://www.jsonrpc.org/specification#notification)
+* [Response](http://www.jsonrpc.org/specification#response_object)
   * [Error](http://www.jsonrpc.org/specification#error_object)
 * [Batch](http://www.jsonrpc.org/specification#batch)
 
