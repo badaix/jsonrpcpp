@@ -4,7 +4,7 @@ C++ [JSON-RPC 2.0](http://www.jsonrpc.org/specification) library
 
 When grown up, this library will be a leightweight JSON-RPC 2.0 C++ library. 
 
-It parses and contructs JSON RPC 2.0 objects, like 
+It parses and constructs JSON RPC 2.0 objects, like 
 * [Request](http://www.jsonrpc.org/specification#request_object)
   * [Notification](http://www.jsonrpc.org/specification#notification)
   * [Parameter](http://www.jsonrpc.org/specification#parameter_structures)
@@ -12,7 +12,7 @@ It parses and contructs JSON RPC 2.0 objects, like
   * [Error](http://www.jsonrpc.org/specification#error_object)
 * [Batch](http://www.jsonrpc.org/specification#batch)
 
-jsonrpc++ is completely transport agnostic and doesn't care about transportation of the messages, i.e. there are no TCP client or server components shipped with this lib. 
+jsonrpc++ is completely transport agnostic, i.e. it doesn't care about transportation of the messages and there are no TCP client or server components shipped with this lib. 
 
 As JSON backbone [JSON for Modern C++](https://nlohmann.github.io/json/) is used.
 
