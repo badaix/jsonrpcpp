@@ -4,7 +4,8 @@ C++ [JSON-RPC 2.0](http://www.jsonrpc.org/specification) library
 
 When grown up, this library will be a leightweight JSON-RPC 2.0 C++ library. 
 
-It parses and constructs JSON RPC 2.0 objects, like 
+###What it is
+jsonrpc++ parses and constructs JSON RPC 2.0 objects, like 
 * [Request](http://www.jsonrpc.org/specification#request_object)
   * [Notification](http://www.jsonrpc.org/specification#notification)
   * [Parameter](http://www.jsonrpc.org/specification#parameter_structures)
@@ -12,6 +13,26 @@ It parses and constructs JSON RPC 2.0 objects, like
   * [Error](http://www.jsonrpc.org/specification#error_object)
 * [Batch](http://www.jsonrpc.org/specification#batch)
 
+
+####Example: Parsing a request
+````c++
+jsonrpc::entity_ptr entity = jsonrpc::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
+if (entity->is_request())
+{
+	jsonrpc::request_ptr request = dynamic_pointer_cast<jsonrpc::Request>(entity);
+	if (request->method == "subtract")
+	{
+		int result = request->params.get<int>("minuend") - request->params.get<int>("subtrahend");
+		jsonrpc::Response response(*request, result);
+		cout << " Response: " << response.to_json().dump() << "\n";
+		//will print: {"jsonrpc": "2.0", "result": 19, "id": 3}
+	}
+	else 
+		throw jsonrpc::MethodNotFoundException(*request);
+}	
+````
+
+###What it not is
 jsonrpc++ is completely transport agnostic, i.e. it doesn't care about transportation of the messages and there are no TCP client or server components shipped with this lib. 
 
 As JSON backbone [JSON for Modern C++](https://nlohmann.github.io/json/) is used.
