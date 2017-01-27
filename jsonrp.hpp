@@ -76,7 +76,7 @@ protected:
 
 
 
-struct Id : Entity
+struct Id : public Entity
 {
 	enum class value_t : uint8_t
 	{
@@ -107,7 +107,7 @@ struct Id : Entity
 
 
 
-struct Parameter : Entity
+struct Parameter : public Entity
 {
 	enum class value_t : uint8_t
 	{
@@ -378,7 +378,6 @@ public:
 	Parameter params;
 	Notification(const Json& json = nullptr);
 
-	//static Json getJson(const std::string& method, const Json& data);
 	virtual void parse(const Json& json);
 	virtual Json to_json() const;
 };
@@ -407,11 +406,12 @@ public:
 };
 
 
-typedef std::shared_ptr<Error> error_ptr;
 typedef std::shared_ptr<Request> request_ptr;
 typedef std::shared_ptr<Notification> notification_ptr;
-typedef std::shared_ptr<Batch> batch_ptr;
+typedef std::shared_ptr<Parameter> parameter_ptr;
 typedef std::shared_ptr<Response> response_ptr;
+typedef std::shared_ptr<Error> error_ptr;
+typedef std::shared_ptr<Batch> batch_ptr;
 
 
 

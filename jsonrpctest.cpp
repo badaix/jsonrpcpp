@@ -10,6 +10,40 @@
 
 using namespace std;
 
+
+jsonrpc::Response getRespone(jsonrpc::request_ptr request)
+{
+	cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params.is_null() << "\n";
+	if (request->method == "subtract")
+	{
+		if (request->params)
+		{
+			int result;
+			if (request->params.is_array())
+				result = request->params.get<int>(0) - request->params.get<int>(1);
+			else
+				result = request->params.get<int>("minuend") - request->params.get<int>("subtrahend");
+
+			return jsonrpc::Response(*request, result);
+		}
+		else
+			throw jsonrpc::InvalidParamsException(*request);
+	}
+	else if (request->method == "sum")
+	{
+		int result = 0;
+		for (const auto& summand: request->params.param_array)
+			result += summand.get<int>();
+		return jsonrpc::Response(*request, result);
+	}
+	else 
+	{
+		throw jsonrpc::MethodNotFoundException(*request);
+	}
+}
+
+
+
 void test(const std::string& json_str)
 {
 	try
@@ -21,35 +55,8 @@ void test(const std::string& json_str)
 			cout << " Json: " << entity->to_json().dump() << "\n";
 			if (entity->is_request())
 			{
-				jsonrpc::request_ptr request = dynamic_pointer_cast<jsonrpc::Request>(entity);
-				cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params.is_null() << "\n";
-				if (request->method == "subtract")
-				{
-					if (request->params)
-					{
-						int result;
-						if (request->params.is_array())
-							result = request->params.get<int>(0) - request->params.get<int>(1);
-						else
-							result = request->params.get<int>("minuend") - request->params.get<int>("subtrahend");
-
-						jsonrpc::Response response;
-						response = jsonrpc::Response(*request, result);
-						cout << " Response: " << response.to_json().dump() << "\n";
-					}
-				}
-				else if (request->method == "sum")
-				{
-					int result = 0;
-					for (const auto& summand: request->params.param_array)
-						result += summand.get<int>();
-					jsonrpc::Response response(*request, result);
-					cout << " Response: " << response.to_json().dump() << "\n";
-				}
-				else 
-				{
-					throw jsonrpc::MethodNotFoundException(*request);
-				}
+				jsonrpc::Response response = getRespone(dynamic_pointer_cast<jsonrpc::Request>(entity));
+				cout << " Response: " << response.to_json().dump() << "\n";
 			}
 			else if (entity->is_notification())
 			{
@@ -60,9 +67,14 @@ void test(const std::string& json_str)
 			{
 				jsonrpc::batch_ptr batch = dynamic_pointer_cast<jsonrpc::Batch>(entity);
 				cout << " Batch\n";
-				for (const auto& j: batch->entities)
+				for (const auto& batch_entity: batch->entities)
 				{
-					cout << j->type_str() << ": \t" << j->to_json() << "\n";
+					cout << batch_entity->type_str() << ": \t" << batch_entity->to_json() << "\n";
+					if (batch_entity->is_request())
+					{
+						jsonrpc::Response response = getRespone(dynamic_pointer_cast<jsonrpc::Request>(batch_entity));
+						cout << " Response: " << response.to_json().dump() << "\n";
+					}
 				}
 			}
 		}
