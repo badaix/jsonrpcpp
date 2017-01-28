@@ -38,6 +38,7 @@ public:
 	enum class entity_t : uint8_t
 	{
 		unknown,
+		exception,
 		id,
 		error,
 		response,
@@ -47,9 +48,9 @@ public:
 	};
 
 	Entity(entity_t type);
-	Entity(entity_t type, std::nullptr_t);
 	virtual ~Entity();
 	
+	bool is_exception();
 	bool is_id();
 	bool is_error();
 	bool is_response();
@@ -59,11 +60,25 @@ public:
 
 	virtual std::string type_str() const;
 
-	virtual Json to_json() const = 0;
 	virtual void parse(const Json& json) = 0;
+	virtual Json to_json() const = 0;
 
 	virtual void parse(const std::string& json_str);
 	
+protected:
+	entity_t entity;
+};
+
+
+
+
+
+class NullableEntity : public Entity
+{
+public:
+	NullableEntity(entity_t type);
+	NullableEntity(entity_t type, std::nullptr_t);
+	virtual ~NullableEntity();
 	virtual explicit operator bool() const
 	{
 		 return !isNull;
@@ -71,8 +86,9 @@ public:
 
 protected:
 	bool isNull;
-	entity_t entity;
 };
+
+
 
 
 
@@ -91,7 +107,6 @@ struct Id : public Entity
 	Id(const Json& json_id);
 
 	virtual void parse(const Json& json);
-
 	virtual Json to_json() const;
 
 	friend std::ostream& operator<< (std::ostream &out, const Id &id)
@@ -107,7 +122,9 @@ struct Id : public Entity
 
 
 
-struct Parameter : public Entity
+
+
+struct Parameter : public NullableEntity
 {
 	enum class value_t : uint8_t
 	{
@@ -120,7 +137,6 @@ struct Parameter : public Entity
 	Parameter(const Json& json = nullptr);
 
 	virtual void parse(const Json& json);
-
 	virtual Json to_json() const;
 
 	bool is_array() const;
@@ -128,12 +144,20 @@ struct Parameter : public Entity
 	bool is_null() const;
 
 	Json get(const std::string& key) const;
+	Json get(size_t idx) const;
 	bool has(const std::string& key) const;
+	bool has(size_t idx) const;
 
 	template<typename T>
 	T get(const std::string& key) const
 	{
 		return get(key).get<T>();
+	}
+
+	template<typename T>
+	T get(size_t idx) const
+	{
+		return get(idx).get<T>();
 	}
 
 	template<typename T>
@@ -143,16 +167,6 @@ struct Parameter : public Entity
 			return default_value;
 		else
 			return get<T>(key);
-	}
-
-
-	Json get(size_t idx) const;
-	bool has(size_t idx) const;
-
-	template<typename T>
-	T get(size_t idx) const
-	{
-		return get(idx).get<T>();
 	}
 
 	template<typename T>
@@ -171,7 +185,9 @@ struct Parameter : public Entity
 
 
 
-class Error : public Entity
+
+
+class Error : public NullableEntity
 {
 public:
 	Error(const Json& json = nullptr);
@@ -179,7 +195,6 @@ public:
 	Error(const std::string& message, int code, const Json& data = nullptr);
 
 	virtual void parse(const Json& json);
-
 	virtual Json to_json() const;
 
 	int code;
@@ -197,21 +212,23 @@ public:
 class Request : public Entity
 {
 public:
-	std::string method;
-	Parameter params;
-	Id id;
-
 	Request(const Json& json = nullptr);
 
 	virtual void parse(const Json& json);
 	virtual void parse(const std::string& json_str);
-
 	virtual Json to_json() const;
+
+	std::string method;
+	Parameter params;
+	Id id;
 };
 
 
 
-class RpcException : public std::exception {
+
+
+class RpcException : public std::exception
+{
   char* text_;
 public:
 	RpcException(const char* text)
@@ -242,30 +259,31 @@ public:
 
 
 
-class RequestException : public RpcException
+
+class RequestException : public RpcException, public Entity
 {
-  Error error_;
-  Id id_;
 public:
-	RequestException(const Error& error, const Id& requestId = Id()) : RpcException(error.message), error_(error), id_(requestId)
+	Error error;
+	Id id;
+
+	RequestException(const Error& error, const Id& requestId = Id()) : RpcException(error.message), Entity(entity_t::exception), error(error), id(requestId)
 	{
 	}
 
-	RequestException(const RequestException& e) :  RpcException(e.what()), error_(error()), id_(e.id_)
+	RequestException(const RequestException& e) :  RpcException(e.what()), Entity(entity_t::exception), id(e.id)
 	{
 	}
 
-	virtual Error error() const noexcept
+	virtual void parse(const Json& json)
 	{
-		return error_;
 	}
 
-	Json getResponse() const noexcept
+	virtual Json to_json() const
 	{
 		Json response = {
 			{"jsonrpc", "2.0"},
-			{"error", error_.to_json()},
-			{"id", id_.to_json()}
+			{"error", error.to_json()},
+			{"id", id.to_json()}
 		};
 
 		return response;
@@ -351,6 +369,7 @@ public:
 
 
 
+
 class Response : public Entity
 {
 public:
@@ -363,11 +382,13 @@ public:
 	Response(const Id& id, const Error& error);
 	Response(const Request& request, const Json& result);
 	Response(const Request& request, const Error& error);
+	Response(const RequestException& exception);
 
 	virtual void parse(const Json& json);
-
 	virtual Json to_json() const;
 };
+
+
 
 
 
@@ -391,6 +412,15 @@ class Parser
 public:
 	static entity_ptr parse(const std::string& json_str);
 	static entity_ptr parse(const Json& json);
+
+	static bool is_request(const std::string& json_str);
+	static bool is_request(const Json& json);
+	static bool is_notification(const std::string& json_str);
+	static bool is_notification(const Json& json);
+	static bool is_response(const std::string& json_str);
+	static bool is_response(const Json& json);
+	static bool is_batch(const std::string& json_str);
+	static bool is_batch(const Json& json);
 };
 
 
@@ -410,7 +440,6 @@ typedef std::shared_ptr<Request> request_ptr;
 typedef std::shared_ptr<Notification> notification_ptr;
 typedef std::shared_ptr<Parameter> parameter_ptr;
 typedef std::shared_ptr<Response> response_ptr;
-typedef std::shared_ptr<Error> error_ptr;
 typedef std::shared_ptr<Batch> batch_ptr;
 
 

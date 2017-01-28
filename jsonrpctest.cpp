@@ -81,7 +81,8 @@ void test(const std::string& json_str)
 	}
 	catch(const jsonrpc::RequestException& e)
 	{
-		cout << " Response: " << e.getResponse().dump() << "\n";
+		cout << " Response: " << e.to_json().dump() << "\n";
+		cout << " Response: " << jsonrpc::Response(e).to_json().dump() << "\n";
 		cerr << "RequestException: " << e.what() << "\n";
 	}
 	catch(const jsonrpc::RpcException& e)

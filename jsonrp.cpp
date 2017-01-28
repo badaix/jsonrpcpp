@@ -27,18 +27,19 @@ namespace jsonrpc
 
 /////////////////////////// Entity implementation /////////////////////////////
 
-Entity::Entity(entity_t type) : isNull(false), entity(type)
-{
-}
-
-
-Entity::Entity(entity_t type, std::nullptr_t) : isNull(true), entity(type)
+Entity::Entity(entity_t type) : entity(type)
 {
 }
 
 
 Entity::~Entity()
 {
+}
+
+
+bool Entity::is_exception()
+{
+	return (entity == entity_t::exception);
 }
 
 
@@ -92,6 +93,8 @@ std::string Entity::type_str() const
 			return "unknown";
 		case entity_t::id:
 			return "id";
+		case entity_t::exception:
+			return "exception";
 		case entity_t::error:
 			return "error";
 		case entity_t::response:
@@ -111,9 +114,29 @@ std::string Entity::type_str() const
 
 
 
+/////////////////////////// NullableEntity implementation /////////////////////
+
+NullableEntity::NullableEntity(entity_t type) : Entity(type), isNull(false)
+{
+}
+
+
+NullableEntity::NullableEntity(entity_t type, std::nullptr_t) : Entity(type), isNull(true)
+{
+}
+
+
+NullableEntity::~NullableEntity()
+{
+};
+
+
+
+
+
 /////////////////////////// Id implementation /////////////////////////////////
 
-Id::Id() : Entity(entity_t::id, nullptr), type(value_t::null), int_id(0), string_id("")
+Id::Id() : Entity(entity_t::id), type(value_t::null), int_id(0), string_id("")
 {
 }
 
@@ -138,7 +161,6 @@ void Id::parse(const Json& json)
 {
 	if (json.is_null())
 	{
-		isNull = true;
 		type = value_t::null;
 	}
 	else if (json.is_number_integer())
@@ -158,7 +180,7 @@ void Id::parse(const Json& json)
 
 Json Id::to_json() const
 {
-	if (isNull || (type == value_t::null))
+	if (type == value_t::null)
 		return nullptr;
 	else if (type == value_t::string)
 		return string_id;
@@ -174,12 +196,12 @@ Json Id::to_json() const
 
 //////////////////////// Error implementation /////////////////////////////////
 
-Parameter::Parameter(std::nullptr_t) : Entity(entity_t::id, nullptr), type(value_t::null)
+Parameter::Parameter(std::nullptr_t) : NullableEntity(entity_t::id, nullptr), type(value_t::null)
 {
 }
 
 
-Parameter::Parameter(const Json& json) : Entity(entity_t::id), type(value_t::null)
+Parameter::Parameter(const Json& json) : NullableEntity(entity_t::id), type(value_t::null)
 {	
 }
 
@@ -270,12 +292,12 @@ Error::Error(const Json& json) : Error("Internal error", -32603, nullptr)
 }
 
 
-Error::Error(std::nullptr_t) : Entity(entity_t::error, nullptr), code(0), message(""), data(nullptr)
+Error::Error(std::nullptr_t) : NullableEntity(entity_t::error, nullptr), code(0), message(""), data(nullptr)
 {
 }
 
 
-Error::Error(const std::string& message, int code, const Json& data) : Entity(entity_t::error), code(code), message(message), data(data)
+Error::Error(const std::string& message, int code, const Json& data) : NullableEntity(entity_t::error), code(code), message(message), data(data)
 {
 }
 
@@ -443,6 +465,11 @@ Response::Response(const Request& request, const Error& error) : Response(reques
 }
 
 
+Response::Response(const RequestException& exception) : Response(exception.id, exception.error)
+{
+}
+
+
 void Response::parse(const Json& json)
 {
 	try
@@ -515,6 +542,8 @@ void Notification::parse(const Json& json)
 
 		if (json.count("method") == 0)
 			throw RpcException("method is missing");
+		if (!json["method"].is_string())
+			throw RpcException("method must be a string value");
 		method = json["method"];
 		if (method.empty())
 			throw RpcException("method must not be empty");
@@ -566,9 +595,21 @@ void Batch::parse(const Json& json)
 	for (auto it = json.begin(); it != json.end(); ++it) 
 	{
 //		cout << "x: " << it->dump() << "\n";
-		entity_ptr entity = Parser::parse(*it);
-		if (!entity)
-			entity = make_shared<Error>("Invalid Request", -32600);
+		entity_ptr entity(nullptr);
+		try
+		{
+			entity = Parser::parse(*it);
+			if (!entity)
+				entity = make_shared<Error>("Invalid Request", -32600);
+		}
+		catch(const RequestException& e)
+		{
+			entity = make_shared<Error>(e.error);
+		}
+		catch(const std::exception& e)
+		{
+			entity = make_shared<Error>(e.what(), -32600);
+		}
 		entities.push_back(entity);
 	}
 	if (entities.empty())
@@ -609,32 +650,14 @@ entity_ptr Parser::parse(const Json& json)
 {
 	try
 	{
-//		cout << "Parser::parse: " << json.dump() << "\n";
-		if (json.count("method") && json.count("id"))
-		{
-			//Request: contains "method" and "id"
+		if (is_request(json))
 			return make_shared<Request>(json);
-		}
-		else if (json.count("method"))
-		{
-			//Notification: Request w/o "id" => contains "method"
+		else if (is_notification(json))
 			return make_shared<Notification>(json);
-		}
-		else if (json.count("result") && json.count("id"))
-		{
-			//Response: contains "result" and "id"
+		else if (is_response(json))
 			return make_shared<Response>(json);
-		}
-		else if (json.count("code") && json.count("message"))
-		{
-			//Error: contains "code" and "message"
-			return make_shared<Error>(json);
-		}
-		else if (json.is_array())
-		{
-			//Batch: contains an array
+		else if (is_batch(json))
 			return make_shared<Batch>(json);
-		}
 	}
 	catch (const exception& e)
 	{
@@ -643,6 +666,83 @@ entity_ptr Parser::parse(const Json& json)
 
 	return nullptr;
 }
+
+
+bool Parser::is_request(const std::string& json_str)
+{
+	try
+	{
+		return is_request(Json::parse(json_str));
+	}
+	catch (const exception& e)
+	{
+		return false;
+	}
+}
+
+
+bool Parser::is_request(const Json& json)
+{
+	return (json.count("method") && json.count("id"));
+}
+
+
+bool Parser::is_notification(const std::string& json_str)
+{
+	try
+	{
+		return is_notification(Json::parse(json_str));
+	}
+	catch (const exception& e)
+	{
+		return false;
+	}
+}
+
+
+bool Parser:: is_notification(const Json& json)
+{
+	return (json.count("method") && (json.count("id") == 0));
+}
+
+
+bool Parser::is_response(const std::string& json_str)
+{
+	try
+	{
+		return is_response(Json::parse(json_str));
+	}
+	catch (const exception& e)
+	{
+		return false;
+	}
+}
+
+
+bool Parser::is_response(const Json& json)
+{
+	return (json.count("result") && json.count("id"));
+}
+
+
+bool Parser::is_batch(const std::string& json_str)
+{
+	try
+	{
+		return is_batch(Json::parse(json_str));
+	}
+	catch (const exception& e)
+	{
+		return false;
+	}
+}
+
+
+bool Parser::is_batch(const Json& json)
+{
+	return (json.is_array());
+}
+
 
 
 }
