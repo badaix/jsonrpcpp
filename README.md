@@ -16,19 +16,19 @@ jsonrpc++ parses and constructs JSON RPC 2.0 objects, like
 
 ####Example: Parsing a request
 ````c++
-jsonrpc::entity_ptr entity = jsonrpc::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
+jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
 if (entity->is_request())
 {
-	jsonrpc::request_ptr request = dynamic_pointer_cast<jsonrpc::Request>(entity);
+	jsonrpcpp::request_ptr request = dynamic_pointer_cast<jsonrpcpp::Request>(entity);
 	if (request->method == "subtract")
 	{
 		int result = request->params.get<int>("minuend") - request->params.get<int>("subtrahend");
-		jsonrpc::Response response(*request, result);
+		jsonrpcpp::Response response(*request, result);
 		cout << " Response: " << response.to_json().dump() << "\n";
 		//will print: {"jsonrpc": "2.0", "result": 19, "id": 3}
 	}
 	else 
-		throw jsonrpc::MethodNotFoundException(*request);
+		throw jsonrpcpp::MethodNotFoundException(*request);
 }	
 ````
 
@@ -43,10 +43,10 @@ Stay tuned, there's more to come.
 
 ##some code
 ````c++
-jsonrpc::entity_ptr entity = jsonrpc::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
+jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
 if (entity && entity->is_request())
 {
-	jsonrpc::request_ptr request = dynamic_pointer_cast<jsonrpc::Request>(entity);
+	jsonrpcpp::request_ptr request = dynamic_pointer_cast<jsonrpcpp::Request>(entity);
 	cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params.is_null() << "\n";
 	if (request->method == "subtract")
 	{
@@ -56,7 +56,7 @@ if (entity && entity->is_request())
 		else
 			result = request->params.get<int>("minuend") - request->params.get<int>("subtrahend");
 
-		jsonrpc::Response response(*request, result);
+		jsonrpcpp::Response response(*request, result);
 		cout << " Response: " << response.to_json().dump() << "\n";
 	}
 	else if (request->method == "sum")
@@ -64,12 +64,12 @@ if (entity && entity->is_request())
 		int result = 0;
 		for (const auto& summand: request->params.param_array)
 			result += summand.get<int>();
-		jsonrpc::Response response(*request, result);
+		jsonrpcpp::Response response(*request, result);
 		cout << " Response: " << response.to_json().dump() << "\n";
 	}
 	else 
 	{
-		throw jsonrpc::MethodNotFoundException(*request);
+		throw jsonrpcpp::MethodNotFoundException(*request);
 	}
 }
   ````

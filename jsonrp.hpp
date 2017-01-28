@@ -1,19 +1,9 @@
 /***
-    This file is part of snapcast
-    Copyright (C) 2014-2016  Johannes Pohl
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    This file is part of jsonrpcpp
+    Copyright (C) 2017 Johannes Pohl
+    
+    This software may be modified and distributed under the terms
+    of the MIT license.  See the LICENSE file for details.
 ***/
 
 #ifndef JSON_RPC_H
@@ -28,8 +18,25 @@
 
 using Json = nlohmann::json;
 
-namespace jsonrpc
+namespace jsonrpcpp
 {
+
+
+class Entity;
+class Request;
+class Notification;
+class Parameter;
+class Response;
+class Batch;
+
+
+typedef std::shared_ptr<Entity> entity_ptr;
+typedef std::shared_ptr<Request> request_ptr;
+typedef std::shared_ptr<Notification> notification_ptr;
+typedef std::shared_ptr<Parameter> parameter_ptr;
+typedef std::shared_ptr<Response> response_ptr;
+typedef std::shared_ptr<Batch> batch_ptr;
+
 
 
 class Entity
@@ -404,7 +411,7 @@ public:
 };
 
 
-typedef std::shared_ptr<Entity> entity_ptr;
+
 
 
 class Parser
@@ -424,6 +431,9 @@ public:
 };
 
 
+
+
+
 class Batch : public Entity
 {
 public:
@@ -436,16 +446,8 @@ public:
 };
 
 
-typedef std::shared_ptr<Request> request_ptr;
-typedef std::shared_ptr<Notification> notification_ptr;
-typedef std::shared_ptr<Parameter> parameter_ptr;
-typedef std::shared_ptr<Response> response_ptr;
-typedef std::shared_ptr<Batch> batch_ptr;
 
-
-
-
-}
+} //namespace jsonrpc
 
 
 

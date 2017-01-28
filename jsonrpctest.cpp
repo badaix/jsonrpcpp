@@ -1,5 +1,5 @@
 /***
-    This file is part of jsonrpc
+    This file is part of jsonrpcpp
     Copyright (C) 2017 Johannes Pohl
     
     This software may be modified and distributed under the terms
@@ -11,7 +11,7 @@
 using namespace std;
 
 
-jsonrpc::Response getRespone(jsonrpc::request_ptr request)
+jsonrpcpp::Response getRespone(jsonrpcpp::request_ptr request)
 {
 	cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params.is_null() << "\n";
 	if (request->method == "subtract")
@@ -24,21 +24,21 @@ jsonrpc::Response getRespone(jsonrpc::request_ptr request)
 			else
 				result = request->params.get<int>("minuend") - request->params.get<int>("subtrahend");
 
-			return jsonrpc::Response(*request, result);
+			return jsonrpcpp::Response(*request, result);
 		}
 		else
-			throw jsonrpc::InvalidParamsException(*request);
+			throw jsonrpcpp::InvalidParamsException(*request);
 	}
 	else if (request->method == "sum")
 	{
 		int result = 0;
 		for (const auto& summand: request->params.param_array)
 			result += summand.get<int>();
-		return jsonrpc::Response(*request, result);
+		return jsonrpcpp::Response(*request, result);
 	}
 	else 
 	{
-		throw jsonrpc::MethodNotFoundException(*request);
+		throw jsonrpcpp::MethodNotFoundException(*request);
 	}
 }
 
@@ -49,43 +49,43 @@ void test(const std::string& json_str)
 	try
 	{
 		cout << "Test: " << json_str << "\n";
-		jsonrpc::entity_ptr entity = jsonrpc::Parser::parse(json_str);
+		jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(json_str);
 		if (entity)
 		{
 			cout << " Json: " << entity->to_json().dump() << "\n";
 			if (entity->is_request())
 			{
-				jsonrpc::Response response = getRespone(dynamic_pointer_cast<jsonrpc::Request>(entity));
+				jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(entity));
 				cout << " Response: " << response.to_json().dump() << "\n";
 			}
 			else if (entity->is_notification())
 			{
-				jsonrpc::notification_ptr notification = dynamic_pointer_cast<jsonrpc::Notification>(entity);
+				jsonrpcpp::notification_ptr notification = dynamic_pointer_cast<jsonrpcpp::Notification>(entity);
 				cout << " Notification: " << notification->method << ", has params: " << !notification->params.is_null() << "\n";
 			}
 			else if (entity->is_batch())
 			{
-				jsonrpc::batch_ptr batch = dynamic_pointer_cast<jsonrpc::Batch>(entity);
+				jsonrpcpp::batch_ptr batch = dynamic_pointer_cast<jsonrpcpp::Batch>(entity);
 				cout << " Batch\n";
 				for (const auto& batch_entity: batch->entities)
 				{
 					cout << batch_entity->type_str() << ": \t" << batch_entity->to_json() << "\n";
 					if (batch_entity->is_request())
 					{
-						jsonrpc::Response response = getRespone(dynamic_pointer_cast<jsonrpc::Request>(batch_entity));
+						jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(batch_entity));
 						cout << " Response: " << response.to_json().dump() << "\n";
 					}
 				}
 			}
 		}
 	}
-	catch(const jsonrpc::RequestException& e)
+	catch(const jsonrpcpp::RequestException& e)
 	{
 		cout << " Response: " << e.to_json().dump() << "\n";
-		cout << " Response: " << jsonrpc::Response(e).to_json().dump() << "\n";
+		cout << " Response: " << jsonrpcpp::Response(e).to_json().dump() << "\n";
 		cerr << "RequestException: " << e.what() << "\n";
 	}
-	catch(const jsonrpc::RpcException& e)
+	catch(const jsonrpcpp::RpcException& e)
 	{
 		cerr << "RpcException: " << e.what() << "\n";
 	}
