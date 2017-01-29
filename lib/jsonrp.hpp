@@ -224,7 +224,6 @@ public:
 	Request(const Json& json = nullptr);
 
 	virtual void parse(const Json& json);
-	virtual void parse(const std::string& json_str);
 	virtual Json to_json() const;
 
 	std::string method;
@@ -282,7 +281,7 @@ public:
 	{
 	}
 
-	ParseErrorException(const std::string& data) : ParseErrorException(Error("Parse error", -32600, data))
+	ParseErrorException(const std::string& data) : ParseErrorException(Error("Parse error", -32700, data))
 	{
 	}
 

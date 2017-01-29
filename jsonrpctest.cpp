@@ -108,14 +108,18 @@ void test(const std::string& json_str)
 		//cout << " Response: " << jsonrpcpp::Response(e).to_json().dump() << "\n";
 		//cerr << "RequestException: " << e.what() << "\n";
 	}
+	catch(const jsonrpcpp::ParseErrorException& e)
+	{
+		cout << "<-- " << e.to_json().dump() << "\n";
+	}
 	catch(const jsonrpcpp::RpcException& e)
 	{
 		cerr << "RpcException: " << e.what() << "\n";
+		cout << "<-- " << jsonrpcpp::ParseErrorException(e.what()).to_json().dump() << "\n";
 	}
 	catch(const std::exception& e)
 	{
 		cerr << "Exception: " << e.what() << "\n";
-		cout << "<-- " << jsonrpcpp::ParseErrorException(e.what()).to_json().dump() << "\n";
 	}
 	cout << "\n";
 }

@@ -71,7 +71,26 @@ bool Entity::is_batch()
 
 void Entity::parse(const std::string& json_str)
 {
-	parse(Json::parse(json_str));
+	// http://www.jsonrpc.org/specification
+	//	code	message	meaning
+	//	-32700	Parse error	Invalid JSON was received by the server. An error occurred on the server while parsing the JSON text.
+	//	-32600	Invalid Request	The JSON sent is not a valid Request object.
+	//	-32601	Method not found	The method does not exist / is not available.
+	//	-32602	Invalid params	Invalid method parameter(s).
+	//	-32603	Internal error	Internal JSON-RPC error.
+	//	-32000 to -32099	Server error	Reserved for implementation-defined server-errors.
+	try
+	{
+		parse(Json::parse(json_str));
+	}
+	catch (const RpcException& e)
+	{
+		throw;
+	}
+	catch (const exception& e)
+	{
+		throw ParseErrorException(e.what());
+	}
 }
 
 
@@ -389,27 +408,6 @@ void Request::parse(const Json& json)
 }
 
 
-void Request::parse(const std::string& json_str)
-{
-	// http://www.jsonrpc.org/specification
-	//	code	message	meaning
-	//	-32700	Parse error	Invalid JSON was received by the server. An error occurred on the server while parsing the JSON text.
-	//	-32600	Invalid Request	The JSON sent is not a valid Request object.
-	//	-32601	Method not found	The method does not exist / is not available.
-	//	-32602	Invalid params	Invalid method parameter(s).
-	//	-32603	Internal error	Internal JSON-RPC error.
-	//	-32000 to -32099	Server error	Reserved for implementation-defined server-errors.
-	try
-	{
-		parse(Json::parse(json_str));
-	}
-	catch (const exception& e)
-	{
-		throw RequestException(Error(e.what(), -32700));
-	}
-}
-
-
 Json Request::to_json() const
 {
 	Json json = {
@@ -631,9 +629,13 @@ entity_ptr Parser::parse(const std::string& json_str)
 	{
 		return parse(Json::parse(json_str));
 	}
-	catch (const exception& e)
+	catch (const RpcException& e)
 	{
 		throw;
+	}
+	catch (const exception& e)
+	{
+		throw ParseErrorException(e.what());
 	}
 
 	return nullptr;
