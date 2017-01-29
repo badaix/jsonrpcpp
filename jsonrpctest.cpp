@@ -82,7 +82,7 @@ void test(const std::string& json_str)
 	catch(const jsonrpcpp::RequestException& e)
 	{
 		cout << " Response: " << e.to_json().dump() << "\n";
-		cout << " Response: " << jsonrpcpp::Response(e).to_json().dump() << "\n";
+		//cout << " Response: " << jsonrpcpp::Response(e).to_json().dump() << "\n";
 		cerr << "RequestException: " << e.what() << "\n";
 	}
 	catch(const jsonrpcpp::RpcException& e)
@@ -146,6 +146,8 @@ int main(int argc, char* argv[])
 		{"jsonrpc": "2.0", "method": "notify_hello", "params": [7]},
 		{"jsonrpc": "2.0", "method": "subtract", "params": [42,23], "id": "2"},
 		{"foo": "boo"},
+		{"jsonrpc": "2.0", "method": 1, "params": "bar"},
+		{"jsonrpc": "2.0", "method": 1, "params": "bar", "id": 4},
 		{"jsonrpc": "2.0", "method": "foo.get", "params": {"name": "myself"}, "id": "5"},
 		{"jsonrpc": "2.0", "method": "get_data", "id": "9"} 
 	])");
@@ -156,6 +158,7 @@ int main(int argc, char* argv[])
 		{"jsonrpc": "2.0", "method": "notify_sum", "params": [1,2,4]},
 		{"jsonrpc": "2.0", "method": "notify_hello", "params": [7]}
 	])");
+	
 }
 
 

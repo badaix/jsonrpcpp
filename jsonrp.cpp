@@ -367,7 +367,9 @@ void Request::parse(const Json& json)
 
 		if (json.count("method") == 0)
 			throw InvalidRequestException("method is missing", id);
-		method = json["method"].get<string>();
+		if (!json["method"].is_string())
+			throw InvalidRequestException("method must be a string value", id);
+		method = json["method"];
 		if (method.empty())
 			throw InvalidRequestException("method must not be empty", id);
 
@@ -569,6 +571,8 @@ Json Notification::to_json() const
 
 
 
+
+
 //////////////////////// Batch implementation /////////////////////////////////
 
 Batch::Batch(const Json& json) : Entity(entity_t::batch)
@@ -594,7 +598,7 @@ void Batch::parse(const Json& json)
 		}
 		catch(const RequestException& e)
 		{
-			entity = make_shared<Error>(e.error);
+			entity = make_shared<RequestException>(e);
 		}
 		catch(const std::exception& e)
 		{
@@ -619,7 +623,7 @@ Json Batch::to_json() const
 
 
 
-//////////////////////// Batch implementation /////////////////////////////////
+//////////////////////// Parser implementation ////////////////////////////////
 
 entity_ptr Parser::parse(const std::string& json_str)
 {
@@ -629,7 +633,7 @@ entity_ptr Parser::parse(const std::string& json_str)
 	}
 	catch (const exception& e)
 	{
-		throw RpcException(e.what());
+		throw;
 	}
 
 	return nullptr;
@@ -648,6 +652,10 @@ entity_ptr Parser::parse(const Json& json)
 			return make_shared<Response>(json);
 		else if (is_batch(json))
 			return make_shared<Batch>(json);
+	}
+	catch (const RpcException& e)
+	{
+		throw;
 	}
 	catch (const exception& e)
 	{

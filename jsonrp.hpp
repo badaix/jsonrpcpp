@@ -277,7 +277,7 @@ public:
 	{
 	}
 
-	RequestException(const RequestException& e) :  RpcException(e.what()), Entity(entity_t::exception), id(e.id)
+	RequestException(const RequestException& e) :  RpcException(e.what()), Entity(entity_t::exception), error(e.error), id(e.id)
 	{
 	}
 
