@@ -36,6 +36,10 @@ jsonrpcpp::Response getRespone(jsonrpcpp::request_ptr request)
 			result += summand.get<int>();
 		return jsonrpcpp::Response(*request, result);
 	}
+	else if (request->method == "get_data")
+	{
+		return jsonrpcpp::Response(*request, Json({"hello", 5}));
+	}
 	else 
 	{
 		throw jsonrpcpp::MethodNotFoundException(*request);
@@ -61,21 +65,40 @@ void test(const std::string& json_str)
 			else if (entity->is_notification())
 			{
 				jsonrpcpp::notification_ptr notification = dynamic_pointer_cast<jsonrpcpp::Notification>(entity);
-				cout << " Notification: " << notification->method << ", has params: " << !notification->params.is_null() << "\n";
+				cout << "Notification: " << notification->method << ", has params: " << !notification->params.is_null() << "\n";
 			}
 			else if (entity->is_batch())
 			{
 				jsonrpcpp::batch_ptr batch = dynamic_pointer_cast<jsonrpcpp::Batch>(entity);
-				cout << " Batch\n";
+				jsonrpcpp::Batch responseBatch;
+				//cout << " Batch\n";
 				for (const auto& batch_entity: batch->entities)
 				{
-					cout << batch_entity->type_str() << ": \t" << batch_entity->to_json() << "\n";
+					//cout << batch_entity->type_str() << ": \t" << batch_entity->to_json() << "\n";
 					if (batch_entity->is_request())
 					{
-						jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(batch_entity));
-						cout << "<-- " << response.to_json().dump() << "\n";
+						try
+						{
+							jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(batch_entity));
+							responseBatch.entities.push_back(make_shared<jsonrpcpp::Response>(response));
+						}
+						catch(const jsonrpcpp::RequestException& e)
+						{
+							responseBatch.entities.push_back(make_shared<jsonrpcpp::RequestException>(e));
+						}
+					}
+					else if (batch_entity->is_exception())
+					{
+						responseBatch.entities.push_back(batch_entity);
+					}
+					else if (batch_entity->is_error())
+					{
+						jsonrpcpp::error_ptr error = dynamic_pointer_cast<jsonrpcpp::Error>(batch_entity);
+						responseBatch.entities.push_back(make_shared<jsonrpcpp::RequestException>(*error));
 					}
 				}
+				if (!responseBatch.entities.empty())
+					cout << "<-- " << responseBatch.to_json().dump() << "\n";
 			}
 		}
 	}
@@ -92,12 +115,13 @@ void test(const std::string& json_str)
 	catch(const std::exception& e)
 	{
 		cerr << "Exception: " << e.what() << "\n";
+		cout << "<-- " << jsonrpcpp::ParseErrorException(e.what()).to_json().dump() << "\n";
 	}
 	cout << "\n";
 }
 
 
-//example taken from: http://www.jsonrpc.org/specification#examples
+//examples taken from: http://www.jsonrpc.org/specification#examples
 int main(int argc, char* argv[])
 {
 	cout << "rpc call with positional parameters:\n\n";

@@ -27,6 +27,7 @@ class Request;
 class Notification;
 class Parameter;
 class Response;
+class Error;
 class Batch;
 
 
@@ -35,6 +36,7 @@ typedef std::shared_ptr<Request> request_ptr;
 typedef std::shared_ptr<Notification> notification_ptr;
 typedef std::shared_ptr<Parameter> parameter_ptr;
 typedef std::shared_ptr<Response> response_ptr;
+typedef std::shared_ptr<Error> error_ptr;
 typedef std::shared_ptr<Batch> batch_ptr;
 
 
@@ -260,6 +262,43 @@ public:
 	virtual const char* what() const noexcept
 	{
 		return text_;
+	}
+};
+
+
+
+
+
+class ParseErrorException : public RpcException, public Entity
+{
+public:
+	Error error;
+
+	ParseErrorException(const Error& error) : RpcException(error.message), Entity(entity_t::exception), error(error)
+	{
+	}
+
+	ParseErrorException(const ParseErrorException& e) : RpcException(e.what()), Entity(entity_t::exception), error(e.error)
+	{
+	}
+
+	ParseErrorException(const std::string& data) : ParseErrorException(Error("Parse error", -32600, data))
+	{
+	}
+
+	virtual void parse(const Json& json)
+	{
+	}
+
+	virtual Json to_json() const
+	{
+		Json response = {
+			{"jsonrpc", "2.0"},
+			{"error", error.to_json()},
+			{"id", nullptr}
+		};
+
+		return response;
 	}
 };
 
