@@ -2,9 +2,9 @@ BIN       = jsonrpctest
 
 CXX       = clang++
 STRIP     = strip
-CXXFLAGS  = -std=c++0x -Wall -O3 -Ijsonrpcpp -isystem jsonrpcpp/externals
+CXXFLAGS  = -std=c++0x -Wall -O3 -Ilib -isystem lib/externals
 
-OBJ       = jsonrpctest.o jsonrpcpp/jsonrp.o
+OBJ       = jsonrpctest.o lib/jsonrp.o
 
 
 all: $(OBJ)
