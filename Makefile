@@ -1,8 +1,8 @@
 BIN       = jsonrpctest
 
-CXX       = g++
+CXX       = clang++
 STRIP     = strip
-CXXFLAGS  = -std=c++0x -Wall -O3 -I.
+CXXFLAGS  = -std=c++0x -Wall -O3 -I. -isystem externals
 
 OBJ       = jsonrpctest.o jsonrp.o
 

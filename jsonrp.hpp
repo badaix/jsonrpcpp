@@ -25,7 +25,7 @@ namespace jsonrpcpp
 class Entity;
 class Request;
 class Notification;
-class Parameter;
+struct Parameter;
 class Response;
 class Error;
 class Batch;
