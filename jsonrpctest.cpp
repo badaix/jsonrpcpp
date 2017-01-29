@@ -13,7 +13,7 @@ using namespace std;
 
 jsonrpcpp::Response getRespone(jsonrpcpp::request_ptr request)
 {
-	cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params.is_null() << "\n";
+	//cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params.is_null() << "\n";
 	if (request->method == "subtract")
 	{
 		if (request->params)
@@ -48,15 +48,15 @@ void test(const std::string& json_str)
 {
 	try
 	{
-		cout << "Test: " << json_str << "\n";
+		cout << "--> " << json_str << "\n";
 		jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(json_str);
 		if (entity)
 		{
-			cout << " Json: " << entity->to_json().dump() << "\n";
+			//cout << " Json: " << entity->to_json().dump() << "\n";
 			if (entity->is_request())
 			{
 				jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(entity));
-				cout << " Response: " << response.to_json().dump() << "\n";
+				cout << "<-- " << response.to_json().dump() << "\n";
 			}
 			else if (entity->is_notification())
 			{
@@ -73,7 +73,7 @@ void test(const std::string& json_str)
 					if (batch_entity->is_request())
 					{
 						jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(batch_entity));
-						cout << " Response: " << response.to_json().dump() << "\n";
+						cout << "<-- " << response.to_json().dump() << "\n";
 					}
 				}
 			}
@@ -81,9 +81,9 @@ void test(const std::string& json_str)
 	}
 	catch(const jsonrpcpp::RequestException& e)
 	{
-		cout << " Response: " << e.to_json().dump() << "\n";
+		cout << "<-- " << e.to_json().dump() << "\n";
 		//cout << " Response: " << jsonrpcpp::Response(e).to_json().dump() << "\n";
-		cerr << "RequestException: " << e.what() << "\n";
+		//cerr << "RequestException: " << e.what() << "\n";
 	}
 	catch(const jsonrpcpp::RpcException& e)
 	{
@@ -93,55 +93,53 @@ void test(const std::string& json_str)
 	{
 		cerr << "Exception: " << e.what() << "\n";
 	}
-	cout << "\n\n\n";
+	cout << "\n";
 }
 
 
 //example taken from: http://www.jsonrpc.org/specification#examples
 int main(int argc, char* argv[])
 {
+	cout << "rpc call with positional parameters:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "sum", "params": [1, 2, 3, 4, 5], "id": 1})");
 
-	//rpc call with positional parameters:
 	test(R"({"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1})");
 	test(R"({"jsonrpc": "2.0", "method": "subtract", "params": [23, 42], "id": 2})");
 
-	//rpc call with named parameters:
+	cout << "\n\nrpc call with named parameters:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
 	test(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"minuend": 42, "subtrahend": 23}, "id": 4})");
 
-	//a Notification:
+	cout << "\n\na Notification:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "update", "params": [1,2,3,4,5]})");
 	test(R"({"jsonrpc": "2.0", "method": "foobar"})");
 
-	//rpc call of non-existent method:
+	cout << "\n\nrpc call of non-existent method:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "foobar", "id": "1"})");
 
-	//rpc call with invalid JSON:
+	cout << "\n\nrpc call with invalid JSON:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "foobar, "params": "bar", "baz])");
 
-	//rpc call with invalid Request object:
+	cout << "\n\nrpc call with invalid Request object:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": 1, "params": "bar"})");
 
-	//rpc call Batch, invalid JSON:
-	test(R"(
-	[
+	cout << "\n\nrpc call Batch, invalid JSON:\n\n";
+	test(R"(	[
 		{"jsonrpc": "2.0", "method": "sum", "params": [1,2,4], "id": "1"},
 		{"jsonrpc": "2.0", "method"
 	])");
 
-	//rpc call with an empty Array:
+	cout << "\n\nrpc call with an empty Array:\n\n";
 	test(R"([])");
 
-	//rpc call with an invalid Batch (but not empty):
+	cout << "\n\nrpc call with an invalid Batch (but not empty):\n\n";
 	test(R"([1])");
 
-	//rpc call with invalid Batch:
+	cout << "\n\nrpc call with invalid Batch:\n\n";
 	test(R"([1,2,3])");
 
-	//rpc call Batch:
-	test(R"(
-	[
+	cout << "\n\nrpc call Batch:\n\n";
+	test(R"(	[
 		{"jsonrpc": "2.0", "method": "sum", "params": [1,2,4], "id": "1"},
 		{"jsonrpc": "2.0", "method": "notify_hello", "params": [7]},
 		{"jsonrpc": "2.0", "method": "subtract", "params": [42,23], "id": "2"},
@@ -152,9 +150,8 @@ int main(int argc, char* argv[])
 		{"jsonrpc": "2.0", "method": "get_data", "id": "9"} 
 	])");
 
-	//rpc call Batch (all notifications):
-	test(R"(
-	[
+	cout << "\n\nrpc call Batch (all notifications):\n\n";
+	test(R"(	[
 		{"jsonrpc": "2.0", "method": "notify_sum", "params": [1,2,4]},
 		{"jsonrpc": "2.0", "method": "notify_hello", "params": [7]}
 	])");
