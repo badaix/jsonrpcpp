@@ -80,21 +80,21 @@ void test(const std::string& json_str)
 						try
 						{
 							jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(batch_entity));
-							responseBatch.entities.push_back(make_shared<jsonrpcpp::Response>(response));
+							responseBatch.add(response); //<jsonrpcpp::Response>
 						}
 						catch(const jsonrpcpp::RequestException& e)
 						{
-							responseBatch.entities.push_back(make_shared<jsonrpcpp::RequestException>(e));
+							responseBatch.add(e); //<jsonrpcpp::RequestException>
 						}
 					}
 					else if (batch_entity->is_exception())
 					{
-						responseBatch.entities.push_back(batch_entity);
+						responseBatch.add_ptr(batch_entity);
 					}
 					else if (batch_entity->is_error())
 					{
 						jsonrpcpp::error_ptr error = dynamic_pointer_cast<jsonrpcpp::Error>(batch_entity);
-						responseBatch.entities.push_back(make_shared<jsonrpcpp::RequestException>(*error));
+						responseBatch.add(jsonrpcpp::RequestException(*error));
 					}
 				}
 				if (!responseBatch.entities.empty())

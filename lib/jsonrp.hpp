@@ -481,6 +481,18 @@ public:
 
 	virtual void parse(const Json& json);
 	virtual Json to_json() const;
+
+	template<typename T>
+	void add(const T& entity)
+	{
+		entities.push_back(std::make_shared<T>(entity));
+	}
+
+	void add_ptr(const entity_ptr& entity)
+	{
+		entities.push_back(entity);
+	}
+
 };
 
 

@@ -618,6 +618,12 @@ Json Batch::to_json() const
 }
 
 
+/*void Batch::add(const entity_ptr entity)
+{
+	entities.push_back(entity);
+}
+*/
+
 
 
 
