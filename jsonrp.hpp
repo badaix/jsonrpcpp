@@ -306,7 +306,7 @@ public:
 class InvalidRequestException : public RequestException
 {
 public:
-	InvalidRequestException(const Id& requestId = Id()) : RequestException(Error("invalid request", -32600), requestId)
+	InvalidRequestException(const Id& requestId = Id()) : RequestException(Error("Invalid request", -32600), requestId)
 	{
 	}
 
@@ -314,7 +314,7 @@ public:
 	{
 	}
 
-	InvalidRequestException(const std::string& message, const Id& requestId = Id()) : RequestException(Error(message, -32600), requestId)
+	InvalidRequestException(const std::string& data, const Id& requestId = Id()) : RequestException(Error("Invalid request", -32600, data), requestId)
 	{
 	}
 };
@@ -324,7 +324,7 @@ public:
 class MethodNotFoundException : public RequestException
 {
 public:
-	MethodNotFoundException(const Id& requestId = Id()) : RequestException(Error("method not found", -32601), requestId)
+	MethodNotFoundException(const Id& requestId = Id()) : RequestException(Error("Method not found", -32601), requestId)
 	{
 	}
 
@@ -332,7 +332,7 @@ public:
 	{
 	}
 
-	MethodNotFoundException(const std::string& message, const Id& requestId = Id()) : RequestException(Error(message, -32601), requestId)
+	MethodNotFoundException(const std::string& data, const Id& requestId = Id()) : RequestException(Error("Method not found", -32601, data), requestId)
 	{
 	}
 };
@@ -342,7 +342,7 @@ public:
 class InvalidParamsException : public RequestException
 {
 public:
-	InvalidParamsException(const Id& requestId = Id()) : RequestException(Error("invalid params", -32602), requestId)
+	InvalidParamsException(const Id& requestId = Id()) : RequestException(Error("Invalid params", -32602), requestId)
 	{
 	}
 
@@ -350,7 +350,7 @@ public:
 	{
 	}
 
-	InvalidParamsException(const std::string& message, const Id& requestId = Id()) : RequestException(Error(message, -32602), requestId)
+	InvalidParamsException(const std::string& data, const Id& requestId = Id()) : RequestException(Error("Invalid params", -32602, data), requestId)
 	{
 	}
 };
@@ -360,7 +360,7 @@ public:
 class InternalErrorException : public RequestException
 {
 public:
-	InternalErrorException(const Id& requestId = Id()) : RequestException(Error("internal error", -32603), requestId)
+	InternalErrorException(const Id& requestId = Id()) : RequestException(Error("Internal error", -32603), requestId)
 	{
 	}
 
@@ -368,7 +368,7 @@ public:
 	{
 	}
 
-	InternalErrorException(const std::string& message, const Id& requestId = Id()) : RequestException(Error(message, -32603), requestId)
+	InternalErrorException(const std::string& data, const Id& requestId = Id()) : RequestException(Error("Internal error", -32603, data), requestId)
 	{
 	}
 };
