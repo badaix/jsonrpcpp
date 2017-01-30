@@ -69,7 +69,7 @@ bool Entity::is_batch()
 }
 
 
-void Entity::parse(const std::string& json_str)
+void Entity::parse(const char* json_str)
 {
 	// http://www.jsonrpc.org/specification
 	//	code	message	meaning
@@ -91,6 +91,12 @@ void Entity::parse(const std::string& json_str)
 	{
 		throw ParseErrorException(e.what());
 	}
+}
+
+
+void Entity::parse(const std::string& json_str)
+{
+	parse(json_str.c_str());
 }
 
 

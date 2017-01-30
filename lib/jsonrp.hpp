@@ -73,6 +73,7 @@ public:
 	virtual Json to_json() const = 0;
 
 	virtual void parse(const std::string& json_str);
+	virtual void parse(const char* json_str);
 	
 protected:
 	entity_t entity;
