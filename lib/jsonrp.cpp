@@ -81,7 +81,7 @@ void Entity::parse(const char* json_str)
 	//	-32000 to -32099	Server error	Reserved for implementation-defined server-errors.
 	try
 	{
-		parse(Json::parse(json_str));
+		parse_json(Json::parse(json_str));
 	}
 	catch (const RpcException& e)
 	{
@@ -173,11 +173,11 @@ Id::Id(const std::string& id) : Id(id.c_str())
 
 Id::Id(const Json& json_id) : Entity(entity_t::id), type(value_t::null)
 {
-	parse(json_id);
+	parse_json(json_id);
 }
 
 
-void Id::parse(const Json& json)
+void Id::parse_json(const Json& json)
 {
 	if (json.is_null())
 	{
@@ -224,11 +224,11 @@ Parameter::Parameter(std::nullptr_t) : NullableEntity(entity_t::id, nullptr), ty
 Parameter::Parameter(const Json& json) : NullableEntity(entity_t::id), type(value_t::null)
 {
 	if (json != nullptr)
-		parse(json);
+		parse_json(json);
 }
 
 
-void Parameter::parse(const Json& json)
+void Parameter::parse_json(const Json& json)
 {
 	if (json.is_array())
 	{
@@ -310,7 +310,7 @@ Json Parameter::get(size_t idx) const
 Error::Error(const Json& json) : Error("Internal error", -32603, nullptr)
 {
 	if (json != nullptr)
-		parse(json);
+		parse_json(json);
 }
 
 
@@ -324,7 +324,7 @@ Error::Error(const std::string& message, int code, const Json& data) : NullableE
 }
 
 
-void Error::parse(const Json& json)
+void Error::parse_json(const Json& json)
 {
 	try
 	{
@@ -371,7 +371,7 @@ Json Error::to_json() const
 Request::Request(const Json& json) : Entity(entity_t::request), method(""), id()
 {
 	if (json != nullptr)
-		parse(json);
+		parse_json(json);
 }
 
 
@@ -380,7 +380,7 @@ Request::Request(const Id& id, const std::string& method, const Parameter& param
 }
 
 
-void Request::parse(const Json& json)
+void Request::parse_json(const Json& json)
 {
 	try
 	{
@@ -411,7 +411,7 @@ void Request::parse(const Json& json)
 			throw InvalidRequestException("method must not be empty", id);
 
 		if (json.count("params"))
-			params.parse(json["params"]);
+			params.parse_json(json["params"]);
 		else
 			params = nullptr;
 	}
@@ -449,7 +449,7 @@ Json Request::to_json() const
 Response::Response(const Json& json) : Entity(entity_t::response)
 {
 	if (json != nullptr)
-		parse(json);
+		parse_json(json);
 }
 
 
@@ -478,7 +478,7 @@ Response::Response(const RequestException& exception) : Response(exception.id, e
 }
 
 
-void Response::parse(const Json& json)
+void Response::parse_json(const Json& json)
 {
 	try
 	{
@@ -495,7 +495,7 @@ void Response::parse(const Json& json)
 		if (json.count("result"))
 			result = json["result"];
 		else if (json.count("error"))
-			error.parse(json["error"]);
+			error.parse_json(json["error"]);
 		else
 			throw RpcException("response must contain result or error");			
 	}
@@ -533,9 +533,8 @@ Json Response::to_json() const
 
 Notification::Notification(const Json& json) : Entity(entity_t::notification)
 {
-	std::cout << "Notification::Notification(const Json& json)\n";
 	if (json != nullptr)
-		parse(json);
+		parse_json(json);
 }
 
 
@@ -549,7 +548,7 @@ Notification::Notification(const std::string& method, const Parameter& params) :
 }
 
 
-void Notification::parse(const Json& json)
+void Notification::parse_json(const Json& json)
 {
 	try
 	{
@@ -568,7 +567,7 @@ void Notification::parse(const Json& json)
 			throw RpcException("method must not be empty");
 
 		if (json.count("params"))
-			params.parse(json["params"]);
+			params.parse_json(json["params"]);
 		else
 			params = nullptr;
 	}
@@ -605,11 +604,11 @@ Json Notification::to_json() const
 Batch::Batch(const Json& json) : Entity(entity_t::batch)
 {
 	if (json != nullptr)
-		parse(json);
+		parse_json(json);
 }
 
 
-void Batch::parse(const Json& json)
+void Batch::parse_json(const Json& json)
 {
 //	cout << "Batch::parse: " << json.dump() << "\n";
 	entities.clear();
@@ -619,7 +618,7 @@ void Batch::parse(const Json& json)
 		entity_ptr entity(nullptr);
 		try
 		{
-			entity = Parser::parse(*it);
+			entity = Parser::parse_json(*it);
 			if (!entity)
 				entity = make_shared<Error>("Invalid Request", -32600);
 		}
@@ -662,7 +661,7 @@ entity_ptr Parser::parse(const std::string& json_str)
 {
 	try
 	{
-		return parse(Json::parse(json_str));
+		return parse_json(Json::parse(json_str));
 	}
 	catch (const RpcException& e)
 	{
@@ -677,7 +676,7 @@ entity_ptr Parser::parse(const std::string& json_str)
 }
 
 
-entity_ptr Parser::parse(const Json& json)
+entity_ptr Parser::parse_json(const Json& json)
 {
 	try
 	{

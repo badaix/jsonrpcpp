@@ -25,7 +25,7 @@ namespace jsonrpcpp
 class Entity;
 class Request;
 class Notification;
-struct Parameter;
+class Parameter;
 class Response;
 class Error;
 class Batch;
@@ -69,8 +69,8 @@ public:
 
 	virtual std::string type_str() const;
 
-	virtual void parse(const Json& json) = 0;
 	virtual Json to_json() const = 0;
+	virtual void parse_json(const Json& json) = 0;
 
 	virtual void parse(const std::string& json_str);
 	virtual void parse(const char* json_str);
@@ -102,8 +102,9 @@ protected:
 
 
 
-struct Id : public Entity
+class Id : public Entity
 {
+public:
 	enum class value_t : uint8_t
 	{
 		null,
@@ -117,8 +118,8 @@ struct Id : public Entity
 	Id(const std::string& id);
 	Id(const Json& json_id);
 
-	virtual void parse(const Json& json);
 	virtual Json to_json() const;
+	virtual void parse_json(const Json& json);
 
 	friend std::ostream& operator<< (std::ostream &out, const Id &id)
 	{
@@ -135,8 +136,9 @@ struct Id : public Entity
 
 
 
-struct Parameter : public NullableEntity
+class Parameter : public NullableEntity
 {
+public:
 	enum class value_t : uint8_t
 	{
 		null,
@@ -147,8 +149,8 @@ struct Parameter : public NullableEntity
 	Parameter(std::nullptr_t);
 	Parameter(const Json& json = nullptr);
 
-	virtual void parse(const Json& json);
 	virtual Json to_json() const;
+	virtual void parse_json(const Json& json);
 
 	bool is_array() const;
 	bool is_map() const;
@@ -205,8 +207,8 @@ public:
 	Error(std::nullptr_t);
 	Error(const std::string& message, int code, const Json& data = nullptr);
 
-	virtual void parse(const Json& json);
 	virtual Json to_json() const;
+	virtual void parse_json(const Json& json);
 
 	int code;
 	std::string message;
@@ -226,8 +228,8 @@ public:
 	Request(const Json& json = nullptr);
 	Request(const Id& id, const std::string& method, const Parameter& params = nullptr);
 
-	virtual void parse(const Json& json);
 	virtual Json to_json() const;
+	virtual void parse_json(const Json& json);
 
 	std::string method;
 	Parameter params;
@@ -288,10 +290,6 @@ public:
 	{
 	}
 
-	virtual void parse(const Json& json)
-	{
-	}
-
 	virtual Json to_json() const
 	{
 		Json response = {
@@ -301,6 +299,11 @@ public:
 		};
 
 		return response;
+	}
+
+protected:
+	virtual void parse_json(const Json& json)
+	{
 	}
 };
 
@@ -322,10 +325,6 @@ public:
 	{
 	}
 
-	virtual void parse(const Json& json)
-	{
-	}
-
 	virtual Json to_json() const
 	{
 		Json response = {
@@ -335,6 +334,11 @@ public:
 		};
 
 		return response;
+	}
+
+protected:
+	virtual void parse_json(const Json& json)
+	{
 	}
 };
 
@@ -448,8 +452,8 @@ public:
 	Response(const Request& request, const Error& error);
 	Response(const RequestException& exception);
 
-	virtual void parse(const Json& json);
 	virtual Json to_json() const;
+	virtual void parse_json(const Json& json);
 };
 
 
@@ -465,8 +469,8 @@ public:
 	Notification(const char* method, const Parameter& params = nullptr);
 	Notification(const std::string& method, const Parameter& params);
 
-	virtual void parse(const Json& json);
 	virtual Json to_json() const;
+	virtual void parse_json(const Json& json);
 };
 
 
@@ -477,7 +481,7 @@ class Parser
 {
 public:
 	static entity_ptr parse(const std::string& json_str);
-	static entity_ptr parse(const Json& json);
+	static entity_ptr parse_json(const Json& json);
 
 	static bool is_request(const std::string& json_str);
 	static bool is_request(const Json& json);
@@ -500,8 +504,8 @@ public:
 
 	Batch(const Json& json = nullptr);
 
-	virtual void parse(const Json& json);
 	virtual Json to_json() const;
+	virtual void parse_json(const Json& json);
 
 	template<typename T>
 	void add(const T& entity)
@@ -513,7 +517,6 @@ public:
 	{
 		entities.push_back(entity);
 	}
-
 };
 
 
