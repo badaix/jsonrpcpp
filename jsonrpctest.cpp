@@ -125,25 +125,39 @@ void test(const std::string& json_str)
 }
 
 
+void test(const jsonrpcpp::Entity& entity)
+{
+	test(entity.to_json().dump());
+}
+
+
 //examples taken from: http://www.jsonrpc.org/specification#examples
 int main(int argc, char* argv[])
 {
 	cout << "rpc call with positional parameters:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "sum", "params": [1, 2, 3, 4, 5], "id": 1})");
+	test(jsonrpcpp::Request(1, "sum", Json({1, 2, 3, 4, 5})));
 
 	test(R"({"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1})");
+	test(jsonrpcpp::Request(1, "subtract", Json({42, 23})));
 	test(R"({"jsonrpc": "2.0", "method": "subtract", "params": [23, 42], "id": 2})");
+	test(jsonrpcpp::Request(2, "subtract", Json({23, 42})));
 
 	cout << "\n\nrpc call with named parameters:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
+	test(jsonrpcpp::Request(3, "subtract", Json({{"subtrahend", 23}, {"minuend", 42}})));
 	test(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"minuend": 42, "subtrahend": 23}, "id": 4})");
+	test(jsonrpcpp::Request(4, "subtract", Json({{"minuend", 42}, {"subtrahend", 23}})));
 
 	cout << "\n\na Notification:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "update", "params": [1,2,3,4,5]})");
+	test(jsonrpcpp::Notification("udpate", Json({1, 2, 3, 4, 5})));
 	test(R"({"jsonrpc": "2.0", "method": "foobar"})");
+	test(jsonrpcpp::Notification("foobar"));
 
 	cout << "\n\nrpc call of non-existent method:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "foobar", "id": "1"})");
+	test(jsonrpcpp::Request("1", "foobar"));
 
 	cout << "\n\nrpc call with invalid JSON:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "foobar, "params": "bar", "baz])");

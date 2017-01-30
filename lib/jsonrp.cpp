@@ -155,7 +155,12 @@ Id::Id(int id) : Entity(entity_t::id), type(value_t::integer), int_id(id), strin
 }
 
 
-Id::Id(const std::string& id) : Entity(entity_t::id), type(value_t::string), int_id(0), string_id(id)
+Id::Id(const char* id) : Entity(entity_t::id), type(value_t::string), int_id(0), string_id(id)
+{
+}
+
+
+Id::Id(const std::string& id) : Id(id.c_str())
 {
 }
 
@@ -211,7 +216,9 @@ Parameter::Parameter(std::nullptr_t) : NullableEntity(entity_t::id, nullptr), ty
 
 
 Parameter::Parameter(const Json& json) : NullableEntity(entity_t::id), type(value_t::null)
-{	
+{
+	if (json != nullptr)
+		parse(json);
 }
 
 
@@ -359,6 +366,11 @@ Request::Request(const Json& json) : Entity(entity_t::request), method(""), id()
 {
 	if (json != nullptr)
 		parse(json);
+}
+
+
+Request::Request(const Id& id, const std::string& method, const Parameter& params) : Entity(entity_t::request), method(method), params(params), id(id)
+{
 }
 
 
@@ -515,8 +527,19 @@ Json Response::to_json() const
 
 Notification::Notification(const Json& json) : Entity(entity_t::notification)
 {
+	std::cout << "Notification::Notification(const Json& json)\n";
 	if (json != nullptr)
 		parse(json);
+}
+
+
+Notification::Notification(const char* method, const Parameter& params) : Entity(entity_t::notification), method(method), params(params)
+{
+}
+
+
+Notification::Notification(const std::string& method, const Parameter& params) : Notification(method.c_str(), params)
+{
 }
 
 

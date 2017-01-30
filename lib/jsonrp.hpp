@@ -112,6 +112,7 @@ struct Id : public Entity
 
 	Id();
 	Id(int id);
+	Id(const char* id);
 	Id(const std::string& id);
 	Id(const Json& json_id);
 
@@ -222,6 +223,7 @@ class Request : public Entity
 {
 public:
 	Request(const Json& json = nullptr);
+	Request(const Id& id, const std::string& method, const Parameter& params = nullptr);
 
 	virtual void parse(const Json& json);
 	virtual Json to_json() const;
@@ -352,7 +354,11 @@ public:
 	{
 	}
 
-	InvalidRequestException(const std::string& data, const Id& requestId = Id()) : RequestException(Error("Invalid request", -32600, data), requestId)
+	InvalidRequestException(const char* data, const Id& requestId = Id()) : RequestException(Error("Invalid request", -32600, data), requestId)
+	{
+	}
+
+	InvalidRequestException(const std::string& data, const Id& requestId = Id()) : InvalidRequestException(data.c_str(), requestId)
 	{
 	}
 };
@@ -370,7 +376,11 @@ public:
 	{
 	}
 
-	MethodNotFoundException(const std::string& data, const Id& requestId = Id()) : RequestException(Error("Method not found", -32601, data), requestId)
+	MethodNotFoundException(const char* data, const Id& requestId = Id()) : RequestException(Error("Method not found", -32601, data), requestId)
+	{
+	}
+
+	MethodNotFoundException(const std::string& data, const Id& requestId = Id()) : MethodNotFoundException(data.c_str(), requestId)
 	{
 	}
 };
@@ -388,7 +398,11 @@ public:
 	{
 	}
 
-	InvalidParamsException(const std::string& data, const Id& requestId = Id()) : RequestException(Error("Invalid params", -32602, data), requestId)
+	InvalidParamsException(const char* data, const Id& requestId = Id()) : RequestException(Error("Invalid params", -32602, data), requestId)
+	{
+	}
+
+	InvalidParamsException(const std::string& data, const Id& requestId = Id()) : InvalidParamsException(data.c_str(), requestId)
 	{
 	}
 };
@@ -406,7 +420,11 @@ public:
 	{
 	}
 
-	InternalErrorException(const std::string& data, const Id& requestId = Id()) : RequestException(Error("Internal error", -32603, data), requestId)
+	InternalErrorException(const char* data, const Id& requestId = Id()) : RequestException(Error("Internal error", -32603, data), requestId)
+	{
+	}
+
+	InternalErrorException(const std::string& data, const Id& requestId = Id()) : InternalErrorException(data.c_str(), requestId)
 	{
 	}
 };
@@ -443,6 +461,8 @@ public:
 	std::string method;
 	Parameter params;
 	Notification(const Json& json = nullptr);
+	Notification(const char* method, const Parameter& params = nullptr);
+	Notification(const std::string& method, const Parameter& params);
 
 	virtual void parse(const Json& json);
 	virtual Json to_json() const;
