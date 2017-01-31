@@ -244,29 +244,12 @@ class RpcException : public std::exception
 {
   char* text_;
 public:
-	RpcException(const char* text)
-	{
-		text_ = new char[std::strlen(text) + 1];
-		std::strcpy(text_, text);
-	}
+	RpcException(const char* text);
+	RpcException(const std::string& text);
+	RpcException(const RpcException& e);
 
-	RpcException(const std::string& text) : RpcException(text.c_str())
-	{
-	}
-
-	RpcException(const RpcException& e) : RpcException(e.what())
-	{
-	}
-
-	virtual ~RpcException() throw()
-	{
-		delete[] text_;
-	}
-
-	virtual const char* what() const noexcept
-	{
-		return text_;
-	}
+	virtual ~RpcException() throw();
+	virtual const char* what() const noexcept;
 };
 
 
@@ -278,69 +261,15 @@ class ParseErrorException : public RpcException, public Entity
 public:
 	Error error;
 
-	ParseErrorException(const Error& error) : RpcException(error.message), Entity(entity_t::exception), error(error)
-	{
-	}
-
-	ParseErrorException(const ParseErrorException& e) : RpcException(e.what()), Entity(entity_t::exception), error(e.error)
-	{
-	}
-
-	ParseErrorException(const std::string& data) : ParseErrorException(Error("Parse error", -32700, data))
-	{
-	}
-
-	virtual Json to_json() const
-	{
-		Json response = {
-			{"jsonrpc", "2.0"},
-			{"error", error.to_json()},
-			{"id", nullptr}
-		};
-
-		return response;
-	}
+	ParseErrorException(const Error& error);
+	ParseErrorException(const ParseErrorException& e);
+	ParseErrorException(const std::string& data);
+	virtual Json to_json() const;
 
 protected:
-	virtual void parse_json(const Json& json)
-	{
-	}
+	virtual void parse_json(const Json& json);
 };
 
-
-
-
-
-class RequestException : public RpcException, public Entity
-{
-public:
-	Error error;
-	Id id;
-
-	RequestException(const Error& error, const Id& requestId = Id()) : RpcException(error.message), Entity(entity_t::exception), error(error), id(requestId)
-	{
-	}
-
-	RequestException(const RequestException& e) :  RpcException(e.what()), Entity(entity_t::exception), error(e.error), id(e.id)
-	{
-	}
-
-	virtual Json to_json() const
-	{
-		Json response = {
-			{"jsonrpc", "2.0"},
-			{"error", error.to_json()},
-			{"id", id.to_json()}
-		};
-
-		return response;
-	}
-
-protected:
-	virtual void parse_json(const Json& json)
-	{
-	}
-};
 
 
 //	-32600	Invalid Request	The JSON sent is not a valid Request object.
@@ -348,24 +277,29 @@ protected:
 //	-32602	Invalid params	Invalid method parameter(s).
 //	-32603	Internal error	Internal JSON-RPC error.
 
+class RequestException : public RpcException, public Entity
+{
+public:
+	Error error;
+	Id id;
+
+	RequestException(const Error& error, const Id& requestId = Id());
+	RequestException(const RequestException& e);
+	virtual Json to_json() const;
+
+protected:
+	virtual void parse_json(const Json& json);
+};
+
+
+
 class InvalidRequestException : public RequestException
 {
 public:
-	InvalidRequestException(const Id& requestId = Id()) : RequestException(Error("Invalid request", -32600), requestId)
-	{
-	}
-
-	InvalidRequestException(const Request& request) : InvalidRequestException(request.id)
-	{
-	}
-
-	InvalidRequestException(const char* data, const Id& requestId = Id()) : RequestException(Error("Invalid request", -32600, data), requestId)
-	{
-	}
-
-	InvalidRequestException(const std::string& data, const Id& requestId = Id()) : InvalidRequestException(data.c_str(), requestId)
-	{
-	}
+	InvalidRequestException(const Id& requestId = Id());
+	InvalidRequestException(const Request& request);
+	InvalidRequestException(const char* data, const Id& requestId = Id());
+	InvalidRequestException(const std::string& data, const Id& requestId = Id());
 };
 
 
@@ -373,21 +307,10 @@ public:
 class MethodNotFoundException : public RequestException
 {
 public:
-	MethodNotFoundException(const Id& requestId = Id()) : RequestException(Error("Method not found", -32601), requestId)
-	{
-	}
-
-	MethodNotFoundException(const Request& request) : MethodNotFoundException(request.id)
-	{
-	}
-
-	MethodNotFoundException(const char* data, const Id& requestId = Id()) : RequestException(Error("Method not found", -32601, data), requestId)
-	{
-	}
-
-	MethodNotFoundException(const std::string& data, const Id& requestId = Id()) : MethodNotFoundException(data.c_str(), requestId)
-	{
-	}
+	MethodNotFoundException(const Id& requestId = Id());
+	MethodNotFoundException(const Request& request);
+	MethodNotFoundException(const char* data, const Id& requestId = Id());
+	MethodNotFoundException(const std::string& data, const Id& requestId = Id());
 };
 
 
@@ -395,21 +318,10 @@ public:
 class InvalidParamsException : public RequestException
 {
 public:
-	InvalidParamsException(const Id& requestId = Id()) : RequestException(Error("Invalid params", -32602), requestId)
-	{
-	}
-
-	InvalidParamsException(const Request& request) : InvalidParamsException(request.id)
-	{
-	}
-
-	InvalidParamsException(const char* data, const Id& requestId = Id()) : RequestException(Error("Invalid params", -32602, data), requestId)
-	{
-	}
-
-	InvalidParamsException(const std::string& data, const Id& requestId = Id()) : InvalidParamsException(data.c_str(), requestId)
-	{
-	}
+	InvalidParamsException(const Id& requestId = Id());
+	InvalidParamsException(const Request& request);
+	InvalidParamsException(const char* data, const Id& requestId = Id());
+	InvalidParamsException(const std::string& data, const Id& requestId = Id());
 };
 
 
@@ -417,21 +329,10 @@ public:
 class InternalErrorException : public RequestException
 {
 public:
-	InternalErrorException(const Id& requestId = Id()) : RequestException(Error("Internal error", -32603), requestId)
-	{
-	}
-
-	InternalErrorException(const Request& request) : InternalErrorException(request.id)
-	{
-	}
-
-	InternalErrorException(const char* data, const Id& requestId = Id()) : RequestException(Error("Internal error", -32603, data), requestId)
-	{
-	}
-
-	InternalErrorException(const std::string& data, const Id& requestId = Id()) : InternalErrorException(data.c_str(), requestId)
-	{
-	}
+	InternalErrorException(const Id& requestId = Id());
+	InternalErrorException(const Request& request);
+	InternalErrorException(const char* data, const Id& requestId = Id());
+	InternalErrorException(const std::string& data, const Id& requestId = Id());
 };
 
 

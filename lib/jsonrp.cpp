@@ -442,6 +442,160 @@ Json Request::to_json() const
 
 
 
+RpcException::RpcException(const char* text)
+{
+	text_ = new char[std::strlen(text) + 1];
+	std::strcpy(text_, text);
+}
+
+RpcException::RpcException(const std::string& text) : RpcException(text.c_str())
+{
+}
+
+RpcException::RpcException(const RpcException& e) : RpcException(e.what())
+{
+}
+
+RpcException::~RpcException() throw()
+{
+	delete[] text_;
+}
+
+const char* RpcException::what() const noexcept
+{
+	return text_;
+}
+
+
+
+
+ParseErrorException::ParseErrorException(const Error& error) : RpcException(error.message), Entity(entity_t::exception), error(error)
+{
+}
+
+ParseErrorException::ParseErrorException(const ParseErrorException& e) : RpcException(e.what()), Entity(entity_t::exception), error(e.error)
+{
+}
+
+ParseErrorException::ParseErrorException(const std::string& data) : ParseErrorException(Error("Parse error", -32700, data))
+{
+}
+
+Json ParseErrorException::to_json() const
+{
+	Json response = {
+		{"jsonrpc", "2.0"},
+		{"error", error.to_json()},
+		{"id", nullptr}
+	};
+
+	return response;
+}
+
+void ParseErrorException::parse_json(const Json& json)
+{
+}
+
+
+
+
+RequestException::RequestException(const Error& error, const Id& requestId) : RpcException(error.message), Entity(entity_t::exception), error(error), id(requestId)
+{
+}
+
+RequestException::RequestException(const RequestException& e) :  RpcException(e.what()), Entity(entity_t::exception), error(e.error), id(e.id)
+{
+}
+
+Json RequestException::to_json() const
+{
+	Json response = {
+		{"jsonrpc", "2.0"},
+		{"error", error.to_json()},
+		{"id", id.to_json()}
+	};
+
+	return response;
+}
+
+void RequestException::parse_json(const Json& json)
+{
+}
+
+
+
+
+
+InvalidRequestException::InvalidRequestException(const Id& requestId) : RequestException(Error("Invalid request", -32600), requestId)
+{
+}
+
+InvalidRequestException::InvalidRequestException(const Request& request) : InvalidRequestException(request.id)
+{
+}
+
+InvalidRequestException::InvalidRequestException(const char* data, const Id& requestId) : RequestException(Error("Invalid request", -32600, data), requestId)
+{
+}
+
+InvalidRequestException::InvalidRequestException(const std::string& data, const Id& requestId) : InvalidRequestException(data.c_str(), requestId)
+{
+}
+
+
+
+MethodNotFoundException::MethodNotFoundException(const Id& requestId) : RequestException(Error("Method not found", -32601), requestId)
+{
+}
+
+MethodNotFoundException::MethodNotFoundException(const Request& request) : MethodNotFoundException(request.id)
+{
+}
+
+MethodNotFoundException::MethodNotFoundException(const char* data, const Id& requestId) : RequestException(Error("Method not found", -32601, data), requestId)
+{
+}
+
+MethodNotFoundException::MethodNotFoundException(const std::string& data, const Id& requestId) : MethodNotFoundException(data.c_str(), requestId)
+{
+}
+
+
+
+InvalidParamsException::InvalidParamsException(const Id& requestId) : RequestException(Error("Invalid params", -32602), requestId)
+{
+}
+
+InvalidParamsException::InvalidParamsException(const Request& request) : InvalidParamsException(request.id)
+{
+}
+
+InvalidParamsException::InvalidParamsException(const char* data, const Id& requestId) : RequestException(Error("Invalid params", -32602, data), requestId)
+{
+}
+
+InvalidParamsException::InvalidParamsException(const std::string& data, const Id& requestId) : InvalidParamsException(data.c_str(), requestId)
+{
+}
+
+
+
+InternalErrorException::InternalErrorException(const Id& requestId) : RequestException(Error("Internal error", -32603), requestId)
+{
+}
+
+InternalErrorException::InternalErrorException(const Request& request) : InternalErrorException(request.id)
+{
+}
+
+InternalErrorException::InternalErrorException(const char* data, const Id& requestId) : RequestException(Error("Internal error", -32603, data), requestId)
+{
+}
+
+InternalErrorException::InternalErrorException(const std::string& data, const Id& requestId) : InternalErrorException(data.c_str(), requestId)
+{
+}
+
 
 
 ///////////////////// Response implementation /////////////////////////////////
