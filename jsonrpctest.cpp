@@ -11,6 +11,9 @@
 using namespace std;
 
 
+jsonrpcpp::Parser parser;
+
+
 jsonrpcpp::Response getRespone(jsonrpcpp::request_ptr request)
 {
 	//cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params.is_null() << "\n";
@@ -53,10 +56,14 @@ void test(const std::string& json_str)
 	try
 	{
 		cout << "--> " << json_str << "\n";
-		jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(json_str);
+		jsonrpcpp::entity_ptr entity = parser.parse(json_str);
 		if (entity)
 		{
 			//cout << " Json: " << entity->to_json().dump() << "\n";
+			if (entity->is_response())
+			{
+				cout << "<-- " << entity->to_json().dump() << "\n";
+			}
 			if (entity->is_request())
 			{
 				jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(entity));
@@ -131,9 +138,41 @@ void test(const jsonrpcpp::Entity& entity)
 }
 
 
+void update(const jsonrpcpp::Parameter& params)
+{
+	cout << "Notification callback: update, has params: " << !params.is_null() << "\n";
+}
+
+/*
+void foobar(const jsonrpcpp::Notification& notification, const jsonrpcpp::Parameter& params)
+{
+	cout << "Notification callback: " << notification.method << ", has params: " << !notification.params.is_null() << "\n";
+}
+*/
+
+void foobar(const jsonrpcpp::Parameter& params)
+{
+	cout << "Notification callback: foobar, has params: " << !params.is_null() << "\n";
+}
+
+
+jsonrpcpp::response_ptr sum(const jsonrpcpp::Id& id, const jsonrpcpp::Parameter& params)
+{
+	int result = 0;
+	for (const auto& summand: params.param_array)
+		result += summand.get<int>();
+	cout << "Request callback: sum, result: " << result << "\n";
+	return make_shared<jsonrpcpp::Response>(id, result);
+}
+
+
 //examples taken from: http://www.jsonrpc.org/specification#examples
 int main(int argc, char* argv[])
 {
+	parser.register_notification_callback("update", update);
+	parser.register_notification_callback("foobar", foobar);
+	parser.register_request_callback("sum", sum);
+
 	cout << "rpc call with positional parameters:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "sum", "params": [1, 2, 3, 4, 5], "id": 1})");
 	test(jsonrpcpp::Request(1, "sum", Json({1, 2, 3, 4, 5})));
@@ -151,7 +190,7 @@ int main(int argc, char* argv[])
 
 	cout << "\n\na Notification:\n\n";
 	test(R"({"jsonrpc": "2.0", "method": "update", "params": [1,2,3,4,5]})");
-	test(jsonrpcpp::Notification("udpate", Json({1, 2, 3, 4, 5})));
+	test(jsonrpcpp::Notification("update", Json({1, 2, 3, 4, 5})));
 	test(R"({"jsonrpc": "2.0", "method": "foobar"})");
 	test(jsonrpcpp::Notification("foobar"));
 

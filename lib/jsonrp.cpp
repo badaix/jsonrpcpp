@@ -772,7 +772,7 @@ void Batch::parse_json(const Json& json)
 		entity_ptr entity(nullptr);
 		try
 		{
-			entity = Parser::parse_json(*it);
+			entity = Parser::do_parse_json(*it);
 			if (!entity)
 				entity = make_shared<Error>("Invalid Request", -32600);
 		}
@@ -811,11 +811,75 @@ Json Batch::to_json() const
 
 //////////////////////// Parser implementation ////////////////////////////////
 
+Parser::Parser()
+{
+
+}
+
+
+Parser::~Parser()
+{
+
+}
+
+
+void Parser::register_notification_callback(const std::string& notification, notification_callback callback)
+{
+	if (callback)
+		notification_callbacks_[notification] = callback;
+}
+
+
+void Parser::register_request_callback(const std::string& request, request_callback callback)
+{
+	if (callback)
+		request_callbacks_[request] = callback;
+}
+
+
 entity_ptr Parser::parse(const std::string& json_str)
+{
+	std::cout << "parse: " << json_str << "\n";
+	entity_ptr entity = do_parse(json_str);
+	if (entity && entity->is_notification())
+	{
+		notification_ptr notification = dynamic_pointer_cast<jsonrpcpp::Notification>(entity);
+		if (notification_callbacks_.find(notification->method) != notification_callbacks_.end())
+		{
+			notification_callback callback = notification_callbacks_[notification->method];
+			if (callback)
+				callback(notification->params);
+		}
+	}
+	else if (entity && entity->is_request())
+	{
+		request_ptr request = dynamic_pointer_cast<jsonrpcpp::Request>(entity);
+		if (request_callbacks_.find(request->method) != request_callbacks_.end())
+		{
+			request_callback callback = request_callbacks_[request->method];
+			if (callback)
+			{
+				jsonrpcpp::response_ptr response = callback(request->id, request->params);
+				if (response)
+					return response;
+			}
+		}
+	}
+	return entity;
+}
+
+
+entity_ptr Parser::parse_json(const Json& json)
+{
+	return do_parse_json(json);
+}
+
+
+entity_ptr Parser::do_parse(const std::string& json_str)
 {
 	try
 	{
-		return parse_json(Json::parse(json_str));
+		return do_parse_json(Json::parse(json_str));
 	}
 	catch (const RpcException& e)
 	{
@@ -830,7 +894,7 @@ entity_ptr Parser::parse(const std::string& json_str)
 }
 
 
-entity_ptr Parser::parse_json(const Json& json)
+entity_ptr Parser::do_parse_json(const Json& json)
 {
 	try
 	{

@@ -377,13 +377,24 @@ public:
 
 
 
+typedef std::function<void(const Parameter& params)> notification_callback;
+typedef std::function<jsonrpcpp::response_ptr(const Id& id, const Parameter& params)> request_callback;
+
 
 class Parser
 {
 public:
-	static entity_ptr parse(const std::string& json_str);
-	static entity_ptr parse_json(const Json& json);
+	Parser();
+	virtual ~Parser();
+	
+	entity_ptr parse(const std::string& json_str);
+	entity_ptr parse_json(const Json& json);
 
+	void register_notification_callback(const std::string& notification, notification_callback callback);
+	void register_request_callback(const std::string& request, request_callback callback);
+
+	static entity_ptr do_parse(const std::string& json_str);
+	static entity_ptr do_parse_json(const Json& json);
 	static bool is_request(const std::string& json_str);
 	static bool is_request(const Json& json);
 	static bool is_notification(const std::string& json_str);
@@ -392,6 +403,10 @@ public:
 	static bool is_response(const Json& json);
 	static bool is_batch(const std::string& json_str);
 	static bool is_batch(const Json& json);
+
+private:
+	std::map<std::string, notification_callback> notification_callbacks_;
+	std::map<std::string, request_callback> request_callbacks_;
 };
 
 
