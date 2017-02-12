@@ -228,6 +228,21 @@ Parameter::Parameter(const Json& json) : NullableEntity(entity_t::id), type(valu
 }
 
 
+Parameter::Parameter(const std::string& key1, const Json& value1, 
+                     const std::string& key2, const Json& value2, 
+                     const std::string& key3, const Json& value3, 
+                     const std::string& key4, const Json& value4) : NullableEntity(entity_t::id), type(value_t::map)
+{
+	param_map[key1] = value1;
+	if (!key2.empty())
+		param_map[key2] = value2;
+	if (!key3.empty())
+		param_map[key3] = value3;
+	if (!key4.empty())
+		param_map[key4] = value4;
+}
+
+
 void Parameter::parse_json(const Json& json)
 {
 	if (json.is_array())

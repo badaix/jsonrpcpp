@@ -148,6 +148,10 @@ public:
 
 	Parameter(std::nullptr_t);
 	Parameter(const Json& json = nullptr);
+	Parameter(const std::string& key1, const Json& value1, 
+	          const std::string& key2 = "", const Json& value2 = nullptr, 
+	          const std::string& key3 = "", const Json& value3 = nullptr, 
+	          const std::string& key4 = "", const Json& value4 = nullptr);
 
 	virtual Json to_json() const;
 	virtual void parse_json(const Json& json);
