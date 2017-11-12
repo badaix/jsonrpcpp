@@ -1,15 +1,23 @@
 language: cpp
+dist: trusty
+sudo: required
+group: edge
+
 compiler:
   - gcc
 matrix:
   include:
     # build on ubuntu
     - os: linux
-      sudo: required
+      compiler: gcc
+      env:
+        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
       addons:
         apt:
+          sources:
+            - ubuntu-toolchain-r-test
           packages:
-            - build-essential cmake
+            - g++-4.9
     # build on osx
     - os: osx
       osx_image: xcode9.1
@@ -19,4 +27,3 @@ script:
   - mkdir build
   - cd build
   - cmake .. && make
-  
