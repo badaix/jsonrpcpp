@@ -1,5 +1,5 @@
 /***
-    This file is part of jsonrpcpp
+    This file is part of jsonrpc++
     Copyright (C) 2017 Johannes Pohl
     
     This software may be modified and distributed under the terms

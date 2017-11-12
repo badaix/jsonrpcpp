@@ -1,10 +1,19 @@
 /***
-    This file is part of jsonrpcpp
-    Copyright (C) 2017 Johannes Pohl
+       __  ____   __   __ _  ____  ____   ___  _    _   
+     _(  )/ ___) /  \ (  ( \(  _ \(  _ \ / __)( )  ( )  
+    / \) \\___ \(  O )/    / )   / ) __/( (__(_ _)(_ _) 
+    \____/(____/ \__/ \_)__)(__\_)(__)   \___)(_)  (_)  
+    version 1.0.0
+    https://github.com/badaix/jsonrpcpp
+
+    This file is part of jsonrpc++
+    Copyright (C) 2017  Johannes Pohl
     
     This software may be modified and distributed under the terms
     of the MIT license.  See the LICENSE file for details.
 ***/
+
+/// http://patorjk.com/software/taag/#p=display&f=Graceful&t=JSONRPC%2B%2B
 
 #ifndef JSON_RPC_H
 #define JSON_RPC_H

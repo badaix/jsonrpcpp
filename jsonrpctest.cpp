@@ -1,10 +1,11 @@
 /***
-    This file is part of jsonrpcpp
+    This file is part of jsonrpc++
     Copyright (C) 2017 Johannes Pohl
     
     This software may be modified and distributed under the terms
     of the MIT license.  See the LICENSE file for details.
 ***/
+
 
 #include "jsonrp.hpp"
 
