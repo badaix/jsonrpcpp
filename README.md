@@ -2,6 +2,8 @@
 
 C++ [JSON-RPC 2.0](http://www.jsonrpc.org/specification) library
 
+[![Build Status](https://travis-ci.org/badaix/jsonrpcpp.svg?branch=master)](https://travis-ci.org/badaix/jsonrpcpp)
+
 When grown up, this library will be a leightweight JSON-RPC 2.0 C++ library. 
 
 ### What it is
@@ -38,10 +40,7 @@ jsonrpc++ is completely transport agnostic, i.e. it doesn't care about transport
 As JSON backbone [JSON for Modern C++](https://nlohmann.github.io/json/) is used.
 
 
-Stay tuned, there's more to come.
-
-
-## some code
+## Some code
 ````c++
 jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
 if (entity && entity->is_request())
