@@ -6,6 +6,7 @@ includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 Name: @PROJECT_NAME@
 Description: @PROJECT_DESCRIPTION@
 URL: @PROJECT_URL@
+Version: @PROJECT_VERSION@
 
 Libs: -L${libdir} -ljsonrpcpp
 Cflags: -I${includedir}
