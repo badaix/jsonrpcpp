@@ -29,7 +29,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 if (BUILD_SHARED_LIBS)
     add_library(jsonrpcpp SHARED "${JSONRPCPP_SOURCES}")
-    install(TARGETS jsonrpcpp LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+	if(WIN32)
+		install(TARGETS jsonrpcpp RUNTIME DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+	else()
+		install(TARGETS jsonrpcpp LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+	endif()
+    
 endif (BUILD_SHARED_LIBS)
 
 if (BUILD_STATIC_LIBS)
