@@ -854,7 +854,7 @@ void Parser::register_request_callback(const std::string& request, request_callb
 
 entity_ptr Parser::parse(const std::string& json_str)
 {
-	std::cout << "parse: " << json_str << "\n";
+	//std::cout << "parse: " << json_str << "\n";
 	entity_ptr entity = do_parse(json_str);
 	if (entity && entity->is_notification())
 	{

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(jsonrpcpp CXX)
 set(PROJECT_DESCRIPTION "C++ JSON-RPC 2.0 library")
 set(PROJECT_URL "https://github.com/badaix/jsonrpcpp")
-set(PROJECT_VERSION "1.0.0")
+set(PROJECT_VERSION "1.0.1")
 
 option(BUILD_SHARED_LIBS "Build jsonrpcpp as a shared library" ON)
 option(BUILD_STATIC_LIBS "Build jsonrpcpp as a static library" ON)
