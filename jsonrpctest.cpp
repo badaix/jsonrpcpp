@@ -7,6 +7,7 @@
 ***/
 
 
+#include <iostream>
 #include "jsonrp.hpp"
 
 using namespace std;
