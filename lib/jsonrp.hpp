@@ -98,7 +98,11 @@ public:
 	NullableEntity(entity_t type);
 	NullableEntity(entity_t type, std::nullptr_t);
 	virtual ~NullableEntity();
+#ifdef _MSC_VER
+	virtual operator bool() const
+#else
 	virtual explicit operator bool() const
+#endif
 	{
 		 return !isNull;
 	}
