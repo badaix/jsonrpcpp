@@ -24,10 +24,10 @@ endif()
 
 include_directories(lib)
 set(JSONRPCPP_SOURCES lib/jsonrp.cpp)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 if (BUILD_SHARED_LIBS)
     add_library(jsonrpcpp SHARED "${JSONRPCPP_SOURCES}")
+	target_compile_features(jsonrpcpp PUBLIC cxx_std_11)
 	if(WIN32)
 		install(TARGETS jsonrpcpp RUNTIME DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 	else()
@@ -39,6 +39,7 @@ endif (BUILD_SHARED_LIBS)
 if (BUILD_STATIC_LIBS)
     add_library(jsonrpcpp-static STATIC "${JSONRPCPP_SOURCES}")
     set_target_properties(jsonrpcpp-static PROPERTIES OUTPUT_NAME jsonrpcpp)
+	target_compile_features(jsonrpcpp-static PUBLIC cxx_std_11)
     install(TARGETS jsonrpcpp-static ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 endif (BUILD_STATIC_LIBS)
 
@@ -49,6 +50,7 @@ if (BUILD_TESTS)
     endif (NOT BUILD_STATIC_LIBS)
     add_executable(jsonrpctest jsonrpctest.cpp)
     target_link_libraries(jsonrpctest jsonrpcpp-static)
+	target_compile_features(jsonrpctest PUBLIC cxx_std_11)
 endif (BUILD_TESTS)
 
 install(FILES lib/jsonrp.hpp lib/json.hpp
