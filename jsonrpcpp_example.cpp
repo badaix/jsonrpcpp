@@ -31,8 +31,7 @@ jsonrpcpp::Response getRespone(jsonrpcpp::request_ptr request)
 
 			return jsonrpcpp::Response(*request, result);
 		}
-		else
-			throw jsonrpcpp::InvalidParamsException(*request);
+		throw jsonrpcpp::InvalidParamsException(*request);
 	}
 	else if (request->method == "sum")
 	{
@@ -169,7 +168,7 @@ jsonrpcpp::response_ptr sum(const jsonrpcpp::Id& id, const jsonrpcpp::Parameter&
 
 
 //examples taken from: http://www.jsonrpc.org/specification#examples
-int main(int argc, char* argv[])
+int main(int  /*argc*/, char**  /*argv*/)
 {
 	parser.register_notification_callback("update", update);
 	parser.register_notification_callback("foobar", foobar);
