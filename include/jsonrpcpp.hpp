@@ -8,7 +8,7 @@
 
     This file is part of jsonrpc++
     Copyright (C) 2017-2018 Johannes Pohl
-    
+
     This software may be modified and distributed under the terms
     of the MIT license.  See the LICENSE file for details.
 ***/
@@ -164,9 +164,9 @@ public:
 
 	Parameter(std::nullptr_t);
 	Parameter(const Json& json = nullptr);
-	Parameter(const std::string& key1, const Json& value1, 
-	          const std::string& key2 = "", const Json& value2 = nullptr, 
-	          const std::string& key3 = "", const Json& value3 = nullptr, 
+	Parameter(const std::string& key1, const Json& value1,
+	          const std::string& key2 = "", const Json& value2 = nullptr,
+	          const std::string& key3 = "", const Json& value3 = nullptr,
 	          const std::string& key4 = "", const Json& value4 = nullptr);
 
 	Json to_json() const override;
@@ -545,7 +545,7 @@ inline std::string Entity::type_str() const
 {
 	switch (entity)
 	{
-		case entity_t::unknown: 
+		case entity_t::unknown:
 			return "unknown";
 		case entity_t::id:
 			return "id";
@@ -664,9 +664,9 @@ inline Parameter::Parameter(const Json& json) : NullableEntity(entity_t::id), ty
 }
 
 
-inline Parameter::Parameter(const std::string& key1, const Json& value1, 
-                     const std::string& key2, const Json& value2, 
-                     const std::string& key3, const Json& value3, 
+inline Parameter::Parameter(const std::string& key1, const Json& value1,
+                     const std::string& key2, const Json& value2,
+                     const std::string& key3, const Json& value3,
                      const std::string& key4, const Json& value4) : NullableEntity(entity_t::id), type(value_t::map)
 {
 	param_map[key1] = value1;
@@ -1215,7 +1215,7 @@ inline void Batch::parse_json(const Json& json)
 {
 //	cout << "Batch::parse: " << json.dump() << "\n";
 	entities.clear();
-	for (const auto& it: json) 
+	for (const auto& it: json)
 	{
 //		cout << "x: " << it->dump() << "\n";
 		entity_ptr entity(nullptr);
