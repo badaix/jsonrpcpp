@@ -1,15 +1,13 @@
 # jsonrpc++
 
-C++ [JSON-RPC 2.0](http://www.jsonrpc.org/specification) library
+Leightweight C++ [JSON-RPC 2.0](http://www.jsonrpc.org/specification) library
 
 [![Build Status](https://travis-ci.org/badaix/jsonrpcpp.svg?branch=master)](https://travis-ci.org/badaix/jsonrpcpp)
 [![Github Releases](https://img.shields.io/github/release/badaix/jsonrpcpp.svg)](https://github.com/badaix/jsonrpcpp/releases)
 
-Leightweight JSON-RPC 2.0 C++ library.
-
 ## What it is
 
-jsonrpc++ parses and constructs JSON RPC 2.0 objects, like
+jsonrpc++ parses and constructs [JSON-RPC 2.0](https://www.jsonrpc.org/specification) objects, like
 
 * [Request](http://www.jsonrpc.org/specification#request_object)
   * [Notification](http://www.jsonrpc.org/specification#notification)
