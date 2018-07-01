@@ -18,29 +18,29 @@ jsonrpcpp::Parser parser;
 
 jsonrpcpp::Response getRespone(jsonrpcpp::request_ptr request)
 {
-	//cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params.is_null() << "\n";
-	if (request->method == "subtract")
+	//cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params().is_null() << "\n";
+	if (request->method() == "subtract")
 	{
-		if (request->params)
+		if (request->params())
 		{
 			int result;
-			if (request->params.is_array())
-				result = request->params.get<int>(0) - request->params.get<int>(1);
+			if (request->params().is_array())
+				result = request->params().get<int>(0) - request->params().get<int>(1);
 			else
-				result = request->params.get<int>("minuend") - request->params.get<int>("subtrahend");
+				result = request->params().get<int>("minuend") - request->params().get<int>("subtrahend");
 
 			return jsonrpcpp::Response(*request, result);
 		}
 		throw jsonrpcpp::InvalidParamsException(*request);
 	}
-	else if (request->method == "sum")
+	else if (request->method() == "sum")
 	{
 		int result = 0;
-		for (const auto& summand: request->params.param_array)
+		for (const auto& summand: request->params().param_array)
 			result += summand.get<int>();
 		return jsonrpcpp::Response(*request, result);
 	}
-	else if (request->method == "get_data")
+	else if (request->method() == "get_data")
 	{
 		return jsonrpcpp::Response(*request, Json({"hello", 5}));
 	}
@@ -73,7 +73,7 @@ void test(const std::string& json_str)
 			else if (entity->is_notification())
 			{
 				jsonrpcpp::notification_ptr notification = dynamic_pointer_cast<jsonrpcpp::Notification>(entity);
-				cout << "Notification: " << notification->method << ", has params: " << !notification->params.is_null() << "\n";
+				cout << "Notification: " << notification->method() << ", has params: " << !notification->params().is_null() << "\n";
 			}
 			else if (entity->is_batch())
 			{
@@ -147,7 +147,7 @@ void update(const jsonrpcpp::Parameter& params)
 /*
 void foobar(const jsonrpcpp::Notification& notification, const jsonrpcpp::Parameter& params)
 {
-	cout << "Notification callback: " << notification.method << ", has params: " << !notification.params.is_null() << "\n";
+	cout << "Notification callback: " << notification.method << ", has params: " << !notification.params().is_null() << "\n";
 }
 */
 
