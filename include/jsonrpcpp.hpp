@@ -942,7 +942,7 @@ inline void Request::parse_json(const Json& json)
 			throw InvalidRequestException("method is missing", id_);
 		if (!json["method"].is_string())
 			throw InvalidRequestException("method must be a string value", id_);
-		method_ = json["method"];
+		method_ = json["method"].get<std::string>();
 		if (method_.empty())
 			throw InvalidRequestException("method must not be empty", id_);
 
@@ -1235,7 +1235,7 @@ inline void Notification::parse_json(const Json& json)
 			throw RpcException("method is missing");
 		if (!json["method"].is_string())
 			throw RpcException("method must be a string value");
-		method_ = json["method"];
+		method_ = json["method"].get<std::string>();
 		if (method_.empty())
 			throw RpcException("method must not be empty");
 
