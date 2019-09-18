@@ -1,14 +1,14 @@
 # jsonrpc++
 
-C++ [JSON-RPC 2.0](http://www.jsonrpc.org/specification) library
+Leightweight C++ [JSON-RPC 2.0](http://www.jsonrpc.org/specification) library
 
 [![Build Status](https://travis-ci.org/badaix/jsonrpcpp.svg?branch=master)](https://travis-ci.org/badaix/jsonrpcpp)
 [![Github Releases](https://img.shields.io/github/release/badaix/jsonrpcpp.svg)](https://github.com/badaix/jsonrpcpp/releases)
 
-When grown up, this will be a leightweight JSON-RPC 2.0 C++ library. 
+## What it is
 
-### What it is
-jsonrpc++ parses and constructs JSON RPC 2.0 objects, like 
+jsonrpc++ parses and constructs [JSON-RPC 2.0](https://www.jsonrpc.org/specification) objects, like
+
 * [Request](http://www.jsonrpc.org/specification#request_object)
   * [Notification](http://www.jsonrpc.org/specification#notification)
   * [Parameter](http://www.jsonrpc.org/specification#parameter_structures)
@@ -16,9 +16,9 @@ jsonrpc++ parses and constructs JSON RPC 2.0 objects, like
   * [Error](http://www.jsonrpc.org/specification#error_object)
 * [Batch](http://www.jsonrpc.org/specification#batch)
 
+### Example: Parsing a request
 
-#### Example: Parsing a request
-````c++
+```c++
 jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
 if (entity->is_request())
 {
@@ -30,19 +30,20 @@ if (entity->is_request())
 		cout << " Response: " << response.to_json().dump() << "\n";
 		//will print: {"jsonrpc": "2.0", "result": 19, "id": 3}
 	}
-	else 
+	else
 		throw jsonrpcpp::MethodNotFoundException(*request);
-}	
-````
+}
+```
 
-### What it not is
-jsonrpc++ is completely transport agnostic, i.e. it doesn't care about transportation of the messages and there are no TCP client or server components shipped with this lib. 
+## What it not is
+
+jsonrpc++ is completely transport agnostic, i.e. it doesn't care about transportation of the messages and there is no TCP client or server component shipped with this library.
 
 As JSON backbone [JSON for Modern C++](https://nlohmann.github.io/json/) is used.
 
+## Some code example
 
-## Some code
-````c++
+```c++
 jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
 if (entity && entity->is_request())
 {
@@ -72,4 +73,4 @@ if (entity && entity->is_request())
 		throw jsonrpcpp::MethodNotFoundException(*request);
 	}
 }
-  ````
+```
