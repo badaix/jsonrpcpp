@@ -73,13 +73,13 @@ public:
 	Entity(const Entity &) = default;
 	Entity & operator=(const Entity &) = default;
 
-	bool is_exception();
-	bool is_id();
-	bool is_error();
-	bool is_response();
-	bool is_request();
-	bool is_notification();
-	bool is_batch();
+	bool is_exception() const;
+	bool is_id() const;
+	bool is_error() const;
+	bool is_response() const;
+	bool is_request() const;
+	bool is_notification() const;
+	bool is_batch() const;
 
 	virtual std::string type_str() const;
 
@@ -553,43 +553,43 @@ inline Entity::Entity(entity_t type) : entity(type)
 }
 
 
-inline bool Entity::is_exception()
+inline bool Entity::is_exception() const
 {
 	return (entity == entity_t::exception);
 }
 
 
-inline bool Entity::is_id()
+inline bool Entity::is_id() const
 {
 	return (entity == entity_t::id);
 }
 
 
-inline bool Entity::is_error()
+inline bool Entity::is_error() const
 {
 	return (entity == entity_t::error);
 }
 
 
-inline bool Entity::is_response()
+inline bool Entity::is_response() const
 {
 	return (entity == entity_t::response);
 }
 
 
-inline bool Entity::is_request()
+inline bool Entity::is_request() const
 {
 	return (entity == entity_t::request);
 }
 
 
-inline bool Entity::is_notification()
+inline bool Entity::is_notification() const
 {
 	return (entity == entity_t::notification);
 }
 
 
-inline bool Entity::is_batch()
+inline bool Entity::is_batch() const
 {
 	return (entity == entity_t::batch);
 }
