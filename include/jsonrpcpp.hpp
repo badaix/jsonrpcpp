@@ -1480,7 +1480,7 @@ inline bool Parser::is_response(const std::string& json_str)
 
 inline bool Parser::is_response(const Json& json)
 {
-	return ((json.count("result") != 0u) && (json.count("id") != 0u));
+	return (((json.count("result") != 0u) || (json.count("error") != 0u)) && (json.count("id") != 0u));
 }
 
 
