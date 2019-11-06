@@ -1168,7 +1168,7 @@ inline void Response::parse_json(const Json& json)
 		if (json.count("result") != 0u)
 			result_ = json["result"];
 		else if (json.count("error") != 0u)
-			error_.parse_json(json["error"]);
+			error_ = json["error"];
 		else
 			throw RpcException("response must contain result or error");
 	}
