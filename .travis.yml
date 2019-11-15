@@ -130,4 +130,4 @@ before_install:
 script:
   - mkdir build
   - cd build
-  - cmake .. && make && ./jsonrpcpp_example
+  - cmake .. && make && ./example/jsonrpcpp_example && ./test/jsonrpcpp_test

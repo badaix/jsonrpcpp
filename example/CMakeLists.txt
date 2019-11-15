@@ -1,0 +1,1 @@
+add_executable(jsonrpcpp_example jsonrpcpp_example.cpp)

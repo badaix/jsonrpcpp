@@ -5,6 +5,6 @@ target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 # Make test executable
 set(TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_main.cpp)
-add_executable(test_jsonrpcpp ${TEST_SOURCES})
-target_link_libraries(test_jsonrpcpp Catch)
+add_executable(jsonrpcpp_test ${TEST_SOURCES})
+target_link_libraries(jsonrpcpp_test Catch)
 

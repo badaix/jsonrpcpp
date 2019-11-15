@@ -12,11 +12,12 @@
 
 cmake_minimum_required(VERSION 3.0.0)
 
-project(jsonrpcpp VERSION 1.2.1 LANGUAGES CXX)
+project(jsonrpcpp VERSION 1.2.2 LANGUAGES CXX)
 set(PROJECT_DESCRIPTION "C++ JSON-RPC 2.0 library")
 set(PROJECT_URL "https://github.com/badaix/jsonrpcpp")
 
 option(BUILD_EXAMPLE "Build example (build jsonrpcpp_example demo)" ON)
+option(BUILD_TESTS "Build tests" ON)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -27,18 +28,17 @@ if(NOT DEFINED CMAKE_INSTALL_INCLUDEDIR)
 		PATH "Output directory for header files")
 endif()
 
-
 include_directories(
 	"include"
 )
 
-if (BUILD_EXAMPLE)
-	add_executable(jsonrpcpp_example jsonrpcpp_example.cpp)
-endif (BUILD_EXAMPLE)
-
-
 install(FILES include/jsonrpcpp.hpp include/json.hpp
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/jsonrpcpp")
 
+if (BUILD_EXAMPLE)
+add_subdirectory(example)
+endif (BUILD_EXAMPLE)
 
+if (BUILD_TESTS)
 add_subdirectory(test)
+endif (BUILD_TESTS)

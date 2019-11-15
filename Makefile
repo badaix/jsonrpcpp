@@ -4,7 +4,7 @@ CXX       = clang++
 STRIP     = strip
 CXXFLAGS  = -std=c++11 -Wall -O3 -Iinclude -pedantic -Wextra -Wshadow -Wconversion
 
-OBJ       = jsonrpcpp_example.o
+OBJ       = example/jsonrpcpp_example.o
 
 
 all: $(OBJ)
