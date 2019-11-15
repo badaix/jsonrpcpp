@@ -19,13 +19,13 @@ jsonrpc++ parses and constructs [JSON-RPC 2.0](https://www.jsonrpc.org/specifica
 ### Example: Parsing a request
 
 ```c++
-jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
+jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::do_parse(R"({"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 3})");
 if (entity->is_request())
 {
 	jsonrpcpp::request_ptr request = dynamic_pointer_cast<jsonrpcpp::Request>(entity);
-	if (request->method == "subtract")
+	if (request->method() == "subtract")
 	{
-		int result = request->params.get<int>("minuend") - request->params.get<int>("subtrahend");
+		int result = request->params().get<int>("minuend") - request->params().get<int>("subtrahend");
 		jsonrpcpp::Response response(*request, result);
 		cout << " Response: " << response.to_json().dump() << "\n";
 		//will print: {"jsonrpc": "2.0", "result": 19, "id": 3}

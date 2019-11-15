@@ -40,3 +40,5 @@ endif (BUILD_EXAMPLE)
 install(FILES include/jsonrpcpp.hpp include/json.hpp
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/jsonrpcpp")
 
+
+add_subdirectory(test)
