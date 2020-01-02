@@ -1,0 +1,2 @@
+queries:
+  - exclude: cpp/use-of-goto 
