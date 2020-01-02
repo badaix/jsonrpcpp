@@ -336,7 +336,6 @@ class RequestException : public RpcEntityException
 {
 public:
     RequestException(const Error& error, const Id& requestId = Id());
-    RequestException(const RequestException& e) = default;
     Json to_json() const override;
 
     const Id& id() const
