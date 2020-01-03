@@ -2,8 +2,9 @@
 
 Leightweight C++ [JSON-RPC 2.0](http://www.jsonrpc.org/specification) library
 
-[![Build Status](https://travis-ci.org/badaix/jsonrpcpp.svg?branch=master)](https://travis-ci.org/badaix/jsonrpcpp)
 [![Github Releases](https://img.shields.io/github/release/badaix/jsonrpcpp.svg)](https://github.com/badaix/jsonrpcpp/releases)
+[![Build Status](https://travis-ci.org/badaix/jsonrpcpp.svg?branch=master)](https://travis-ci.org/badaix/jsonrpcpp)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/badaix/jsonrpcpp.svg)](https://lgtm.com/projects/g/badaix/jsonrpcpp/context:cpp)  
 
 ## What it is
 
