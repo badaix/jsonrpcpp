@@ -4,7 +4,7 @@
 # \____/(____/ \__/ \_)__)(__\_)(__)   \___)(_)  (_)  
 
 # This file is part of jsonrpc++
-# Copyright (C) 2017-2019 Johannes Pohl
+# Copyright (C) 2017-2020 Johannes Pohl
 
 # This software may be modified and distributed under the terms
 # of the MIT license.  See the LICENSE file for details.
@@ -12,7 +12,7 @@
 
 cmake_minimum_required(VERSION 3.0.0)
 
-project(jsonrpcpp VERSION 1.3.1 LANGUAGES CXX)
+project(jsonrpcpp VERSION 1.3.2 LANGUAGES CXX)
 set(PROJECT_DESCRIPTION "C++ JSON-RPC 2.0 library")
 set(PROJECT_URL "https://github.com/badaix/jsonrpcpp")
 

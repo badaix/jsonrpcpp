@@ -3,11 +3,11 @@
      _(  )/ ___) /  \ (  ( \(  _ \(  _ \ / __)( )  ( )
     / \) \\___ \(  O )/    / )   / ) __/( (__(_ _)(_ _)
     \____/(____/ \__/ \_)__)(__\_)(__)   \___)(_)  (_)
-    version 1.3.1
+    version 1.3.2
     https://github.com/badaix/jsonrpcpp
 
     This file is part of jsonrpc++
-    Copyright (C) 2017-2019 Johannes Pohl
+    Copyright (C) 2017-2020 Johannes Pohl
 
     This software may be modified and distributed under the terms
     of the MIT license.  See the LICENSE file for details.
@@ -630,7 +630,7 @@ inline Id::Id(const std::string& id) : Id(id.c_str())
 {
 }
 
-inline Id::Id(const Json& json_id) : Entity(entity_t::id), type_(value_t::null)
+inline Id::Id(const Json& json_id) : Id()
 {
     Id::parse_json(json_id);
 }
@@ -802,10 +802,7 @@ inline void Error::parse_json(const Json& json)
 
 inline Json Error::to_json() const
 {
-    Json j = {
-        {"code", code_},
-        {"message", message_},
-    };
+    Json j = {{"code", code_}, {"message", message_}};
 
     if (!data_.is_null())
         j["data"] = data_;
@@ -1065,10 +1062,7 @@ inline void Response::parse_json(const Json& json)
 
 inline Json Response::to_json() const
 {
-    Json j = {
-        {"jsonrpc", "2.0"},
-        {"id", id_.to_json()},
-    };
+    Json j = {{"jsonrpc", "2.0"}, {"id", id_.to_json()}};
 
     if (error_)
         j["error"] = error_.to_json();
@@ -1130,10 +1124,7 @@ inline void Notification::parse_json(const Json& json)
 
 inline Json Notification::to_json() const
 {
-    Json json = {
-        {"jsonrpc", "2.0"},
-        {"method", method_},
-    };
+    Json json = {{"jsonrpc", "2.0"}, {"method", method_}};
 
     if (params_)
         json["params"] = params_.to_json();
