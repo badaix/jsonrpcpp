@@ -12,7 +12,7 @@
 
 cmake_minimum_required(VERSION 3.0.0)
 
-project(jsonrpcpp VERSION 1.3.0 LANGUAGES CXX)
+project(jsonrpcpp VERSION 1.3.1 LANGUAGES CXX)
 set(PROJECT_DESCRIPTION "C++ JSON-RPC 2.0 library")
 set(PROJECT_URL "https://github.com/badaix/jsonrpcpp")
 

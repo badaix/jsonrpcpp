@@ -3,7 +3,7 @@
      _(  )/ ___) /  \ (  ( \(  _ \(  _ \ / __)( )  ( )
     / \) \\___ \(  O )/    / )   / ) __/( (__(_ _)(_ _)
     \____/(____/ \__/ \_)__)(__\_)(__)   \___)(_)  (_)
-    version 1.3.0
+    version 1.3.1
     https://github.com/badaix/jsonrpcpp
 
     This file is part of jsonrpc++
