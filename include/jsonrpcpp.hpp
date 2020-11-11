@@ -695,7 +695,13 @@ inline Parameter::Parameter(const std::string& key1, const Json& value1, const s
 
 inline void Parameter::parse_json(const Json& json)
 {
-    if (json.is_array())
+    if (json.is_null())
+    {
+        param_array.clear();
+        param_map.clear();
+        type = value_t::null;
+    }
+    else if (json.is_array())
     {
         param_array = json.get<std::vector<Json>>();
         param_map.clear();
