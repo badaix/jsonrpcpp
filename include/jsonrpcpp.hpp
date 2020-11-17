@@ -700,6 +700,7 @@ inline void Parameter::parse_json(const Json& json)
         param_array.clear();
         param_map.clear();
         type = value_t::null;
+        isNull = true;
     }
     else if (json.is_array())
     {
@@ -737,7 +738,7 @@ inline bool Parameter::is_map() const
 
 inline bool Parameter::is_null() const
 {
-    return isNull;
+    return type == value_t::null;
 }
 
 inline bool Parameter::has(const std::string& key) const
