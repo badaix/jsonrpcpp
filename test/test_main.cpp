@@ -27,3 +27,20 @@ TEST_CASE("Main test")
     REQUIRE(response.result() == 19);
     REQUIRE(response.to_json() == nlohmann::json::parse(R"({"jsonrpc": "2.0", "result": 19, "id": 3})"));
 }
+
+TEST_CASE("Null parameter")
+{
+    jsonrpcpp::entity_ptr entity =
+        jsonrpcpp::Parser::do_parse(R"({"jsonrpc": "2.0", "method": "nullrequest", "params": null, "id": 4})");
+    REQUIRE(entity->is_request());
+    jsonrpcpp::request_ptr request = dynamic_pointer_cast<jsonrpcpp::Request>(entity);
+    REQUIRE(request->method() == "nullrequest");
+    REQUIRE(request->params().to_json() == nullptr);
+    REQUIRE(request->params().is_null() == true);
+    int result = 12;
+    jsonrpcpp::Response response(*request, result);
+    REQUIRE(response.id().type() == jsonrpcpp::Id::value_t::integer);
+    REQUIRE(response.id().int_id() == 4);
+    REQUIRE(response.result() == 12);
+    REQUIRE(response.to_json() == nlohmann::json::parse(R"({"jsonrpc": "2.0", "result": 12, "id": 4})"));
+}
