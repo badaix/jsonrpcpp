@@ -1,6 +1,6 @@
 /***
     This file is part of jsonrpc++
-    Copyright (C) 2017-2020 Johannes Pohl
+    Copyright (C) 2017-2021 Johannes Pohl
 
     This software may be modified and distributed under the terms
     of the MIT license.  See the LICENSE file for details.
@@ -30,8 +30,7 @@ TEST_CASE("Main test")
 
 TEST_CASE("Null parameter")
 {
-    jsonrpcpp::entity_ptr entity =
-        jsonrpcpp::Parser::do_parse(R"({"jsonrpc": "2.0", "method": "nullrequest", "params": null, "id": 4})");
+    jsonrpcpp::entity_ptr entity = jsonrpcpp::Parser::do_parse(R"({"jsonrpc": "2.0", "method": "nullrequest", "params": null, "id": 4})");
     REQUIRE(entity->is_request());
     jsonrpcpp::request_ptr request = dynamic_pointer_cast<jsonrpcpp::Request>(entity);
     REQUIRE(request->method() == "nullrequest");

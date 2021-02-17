@@ -3,11 +3,11 @@
      _(  )/ ___) /  \ (  ( \(  _ \(  _ \ / __)( )  ( )
     / \) \\___ \(  O )/    / )   / ) __/( (__(_ _)(_ _)
     \____/(____/ \__/ \_)__)(__\_)(__)   \___)(_)  (_)
-    version 1.3.2
+    version 1.3.3
     https://github.com/badaix/jsonrpcpp
 
     This file is part of jsonrpc++
-    Copyright (C) 2017-2020 Johannes Pohl
+    Copyright (C) 2017-2021 Johannes Pohl
 
     This software may be modified and distributed under the terms
     of the MIT license.  See the LICENSE file for details.
@@ -560,7 +560,7 @@ inline void Entity::parse(const char* json_str)
     {
         parse_json(Json::parse(json_str));
     }
-    catch (const RpcException& e)
+    catch (const RpcException&)
     {
         throw;
     }
@@ -797,7 +797,7 @@ inline void Error::parse_json(const Json& json)
         else
             data_ = nullptr;
     }
-    catch (const RpcException& e)
+    catch (const RpcException&)
     {
         throw;
     }
@@ -864,7 +864,7 @@ inline void Request::parse_json(const Json& json)
         else
             params_ = nullptr;
     }
-    catch (const RequestException& e)
+    catch (const RequestException&)
     {
         throw;
     }
@@ -1057,7 +1057,7 @@ inline void Response::parse_json(const Json& json)
         else
             throw RpcException("response must contain result or error");
     }
-    catch (const RpcException& e)
+    catch (const RpcException&)
     {
         throw;
     }
@@ -1119,7 +1119,7 @@ inline void Notification::parse_json(const Json& json)
         else
             params_ = nullptr;
     }
-    catch (const RpcException& e)
+    catch (const RpcException&)
     {
         throw;
     }
@@ -1241,7 +1241,7 @@ inline entity_ptr Parser::do_parse(const std::string& json_str)
     {
         return do_parse_json(Json::parse(json_str));
     }
-    catch (const RpcException& e)
+    catch (const RpcException&)
     {
         throw;
     }
@@ -1266,7 +1266,7 @@ inline entity_ptr Parser::do_parse_json(const Json& json)
         if (is_batch(json))
             return std::make_shared<Batch>(json);
     }
-    catch (const RpcException& e)
+    catch (const RpcException&)
     {
         throw;
     }
@@ -1284,7 +1284,7 @@ inline bool Parser::is_request(const std::string& json_str)
     {
         return is_request(Json::parse(json_str));
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         return false;
     }
@@ -1301,7 +1301,7 @@ inline bool Parser::is_notification(const std::string& json_str)
     {
         return is_notification(Json::parse(json_str));
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         return false;
     }
@@ -1318,7 +1318,7 @@ inline bool Parser::is_response(const std::string& json_str)
     {
         return is_response(Json::parse(json_str));
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         return false;
     }
@@ -1335,7 +1335,7 @@ inline bool Parser::is_batch(const std::string& json_str)
     {
         return is_batch(Json::parse(json_str));
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         return false;
     }
