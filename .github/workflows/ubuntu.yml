@@ -8,7 +8,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: dependencies
     - name: cmake build
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     - name: cmake make
