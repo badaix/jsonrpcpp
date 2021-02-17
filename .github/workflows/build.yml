@@ -1,12 +1,11 @@
-name: macOS-x86_64
-
 on: [push, pull_request]
 
 jobs:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest]
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: dependencies
