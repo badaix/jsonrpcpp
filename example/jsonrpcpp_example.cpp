@@ -16,7 +16,7 @@ using namespace std;
 jsonrpcpp::Parser parser;
 
 
-jsonrpcpp::Response getRespone(jsonrpcpp::request_ptr request)
+jsonrpcpp::Response getResponse(jsonrpcpp::request_ptr request)
 {
     // cout << " Request: " << request->method << ", id: " << request->id << ", has params: " << !request->params().is_null() << "\n";
     if (request->method() == "subtract")
@@ -67,7 +67,7 @@ void test(const std::string& json_str)
             }
             if (entity->is_request())
             {
-                jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(entity));
+                jsonrpcpp::Response response = getResponse(dynamic_pointer_cast<jsonrpcpp::Request>(entity));
                 cout << "<-- " << response.to_json().dump() << "\n";
             }
             else if (entity->is_notification())
@@ -87,7 +87,7 @@ void test(const std::string& json_str)
                     {
                         try
                         {
-                            jsonrpcpp::Response response = getRespone(dynamic_pointer_cast<jsonrpcpp::Request>(batch_entity));
+                            jsonrpcpp::Response response = getResponse(dynamic_pointer_cast<jsonrpcpp::Request>(batch_entity));
                             responseBatch.add(response); //<jsonrpcpp::Response>
                         }
                         catch (const jsonrpcpp::RequestException& e)
