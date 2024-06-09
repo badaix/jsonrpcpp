@@ -197,4 +197,4 @@ jobs:
       - name: build
         run: cmake --build build --config Release --parallel 3 --verbose
       - name: test
-        run: .\build\test\jsonrpcpp_test.exe
+        run: .\build\test\Release\jsonrpcpp_test.exe
