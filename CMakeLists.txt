@@ -18,6 +18,7 @@ set(PROJECT_URL "https://github.com/badaix/jsonrpcpp")
 
 option(BUILD_EXAMPLE "Build example (build jsonrpcpp_example demo)" ON)
 option(BUILD_TESTS "Build tests" ON)
+option(WERROR "Treat warnings as errors" OFF)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -34,6 +35,25 @@ include_directories(
 
 install(FILES include/jsonrpcpp.hpp include/json.hpp
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/jsonrpcpp")
+
+if(MSVC)
+    # warning level 4 and all warnings as errors warning C4505: 'getArch':
+    # unreferenced local function has been removed warning C4458: declaration of
+    # 'size' hides class member warning C4459: declaration of 'query' hides global
+    # declaration
+    add_compile_options(/W4 /wd4458 /wd4459 /wd4505)
+    if(WERROR)
+        add_compile_options(/WX)
+    endif()
+else()
+    # lots of warnings and all warnings as errors
+    add_compile_options(-Wall -Wextra -pedantic)
+
+    if(WERROR)
+        add_compile_options(-Werror)
+    endif()
+endif()
+  
 
 if (BUILD_EXAMPLE)
 add_subdirectory(example)

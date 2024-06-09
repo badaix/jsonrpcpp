@@ -94,9 +94,9 @@ jobs:
       - name: print environment
         run: env
       - name: configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -DWERROR=ON -DCMAKE_BUILD_TYPE=Release
       - name: build
-        run: cmake --build build --parallel 3
+        run: cmake --build build --parallel 8
         env:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
@@ -157,11 +157,11 @@ jobs:
       - name: print environment
         run: env
       - name: configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -DWERROR=ON -DCMAKE_BUILD_TYPE=Release
         env:
           DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
       - name: build
-        run: cmake --build build --parallel 3 --verbose
+        run: cmake --build build --parallel 8 --verbose
       - name: test
         run: ./build/test/jsonrpcpp_test
 
@@ -195,6 +195,6 @@ jobs:
             -DVCPKG_TARGET_TRIPLET="x64-windows" `
             -DCMAKE_BUILD_TYPE=Release `"
       - name: build
-        run: cmake --build build --config Release --parallel 3 --verbose
+        run: cmake --build build --config Release --parallel 8 --verbose
       - name: test
         run: .\build\test\Release\jsonrpcpp_test.exe
