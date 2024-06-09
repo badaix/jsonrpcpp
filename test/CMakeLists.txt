@@ -1,10 +1,14 @@
-# Prepare "Catch" library for other executables
-set(CATCH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
+include(FetchContent)
+
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.6.0 # or a later release
+)
+
+FetchContent_MakeAvailable(Catch2)
 
 # Make test executable
-set(TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_main.cpp)
-add_executable(jsonrpcpp_test ${TEST_SOURCES})
-target_link_libraries(jsonrpcpp_test Catch)
+add_executable(jsonrpcpp_test ${CMAKE_CURRENT_SOURCE_DIR}/test_main.cpp)
 
+target_link_libraries(jsonrpcpp_test Catch2::Catch2WithMain)

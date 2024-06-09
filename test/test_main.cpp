@@ -6,8 +6,7 @@
     of the MIT license.  See the LICENSE file for details.
 ***/
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 #include "jsonrpcpp.hpp"
 
 using namespace std;
