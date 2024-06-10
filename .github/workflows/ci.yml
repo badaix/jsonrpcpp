@@ -99,7 +99,7 @@ jobs:
       - name: configure
         run: cmake -S . -B build -DWERROR=ON -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
       - name: build
-        run: cmake --build build --parallel 8
+        run: cmake --build build --parallel 8 --verbose
         env:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
@@ -125,6 +125,9 @@ jobs:
           - "15.2"
           - "15.3"
           - "15.4"
+        build-type:
+          - Release
+          - Debug
         include:
           - xcode: "13.1"
             os: macos-12
@@ -160,7 +163,7 @@ jobs:
       - name: print environment
         run: env
       - name: configure
-        run: cmake -S . -B build -DWERROR=ON -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -DWERROR=ON -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
         env:
           DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
       - name: build
@@ -177,6 +180,9 @@ jobs:
         compiler:
           - vs-16
           - vs-17
+        build-type:
+          - Release
+          - Debug
         include:
           - compiler: vs-16
             os: windows-2019
@@ -196,8 +202,8 @@ jobs:
             -DWERROR=ON `
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET="x64-windows" `
-            -DCMAKE_BUILD_TYPE=Release `"
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} `"
       - name: build
-        run: cmake --build build --config Release --parallel 8 --verbose
+        run: cmake --build build --config ${{ matrix.build-type }} --parallel 8 --verbose
       - name: test
         run: .\build\test\Release\jsonrpcpp_test.exe
