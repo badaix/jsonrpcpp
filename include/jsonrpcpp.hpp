@@ -1249,8 +1249,10 @@ inline entity_ptr Parser::do_parse(const std::string& json_str)
     {
         throw ParseErrorException(e.what());
     }
-
-    return nullptr;
+    catch (...)
+    {
+        return nullptr;
+    }
 }
 
 inline entity_ptr Parser::do_parse_json(const Json& json)

@@ -1,13 +1,17 @@
 /***
     This file is part of jsonrpc++
-    Copyright (C) 2017-2021 Johannes Pohl
+    Copyright (C) 2017-2024  Johannes Pohl
 
     This software may be modified and distributed under the terms
     of the MIT license.  See the LICENSE file for details.
 ***/
 
-#include <catch2/catch_test_macros.hpp>
+// local headers
 #include "jsonrpcpp.hpp"
+
+// 3rd party headers
+#include <catch2/catch_test_macros.hpp>
+
 
 using namespace std;
 
