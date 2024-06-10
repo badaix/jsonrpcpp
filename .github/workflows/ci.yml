@@ -25,6 +25,9 @@ jobs:
           - gcc-12
           - gcc-13
           - gcc-14
+        build-type:
+          - Release
+          - Debug
         include:
           - compiler: clang-10
             cc: clang-10
@@ -94,7 +97,7 @@ jobs:
       - name: print environment
         run: env
       - name: configure
-        run: cmake -S . -B build -DWERROR=ON -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -DWERROR=ON -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
       - name: build
         run: cmake --build build --parallel 8
         env:
