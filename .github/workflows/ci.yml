@@ -206,4 +206,4 @@ jobs:
       - name: build
         run: cmake --build build --config ${{ matrix.build-type }} --parallel 8 --verbose
       - name: test
-        run: .\build\test\Release\jsonrpcpp_test.exe
+        run: .\build\test\${{ matrix.build-type }}\jsonrpcpp_test.exe
