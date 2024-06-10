@@ -28,6 +28,8 @@
 *.out
 *.app
 
+.cache
+
 jsonrpctest
 .vscode
 build
